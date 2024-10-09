@@ -2,24 +2,48 @@ package com.example.srodenas.simulacioncrud.Views;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.srodenas.simulacioncrud.Logic.ClaseA;
+import com.example.srodenas.simulacioncrud.R;
 
 
 public class SecondActivity extends AppCompatActivity {
     private static final String TAG = "SecondActivity";
     private String variable1 = "Inicial";
     private String variable2 = "Inicial";
+    private Button btnSaludar;
+    private Button btnNoSaludar;
+    private Button btnSaludarClase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
-        variable1 = "onCreate";
-        variable2 = "onCreate";
+        setContentView(R.layout.second_activity);
+        Button btnSaludar = findViewById(R.id.btn_saludar);
+        Button btnNoSaludar = findViewById(R.id.btn_no_saludar);
+        Button btnSaludarClase = findViewById(R.id.btn_saludar_clase);
+        btnSaludar.setOnClickListener(view -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Has pulsado el botón Saludar");
+            builder.show();
+        });
+        btnNoSaludar.setOnClickListener(view -> {
+            AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+            builder2.setMessage("Has pulsado el botón No Saludar");
+            builder2.show();
+        });
+        btnSaludarClase.setOnClickListener(view -> {
+            AlertDialog.Builder builder3 = new AlertDialog.Builder(this);
+            builder3.setMessage("Has pulsado el botón Saludar a Clase");
+            builder3.show();
+        });
     }
 
     @Override
