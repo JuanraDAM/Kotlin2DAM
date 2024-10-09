@@ -2,8 +2,6 @@ package com.example.srodenas.simulacioncrud.Views
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.srodenas.simulacioncrud.Logic.Client
@@ -36,7 +34,7 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
         myButtonAdd = findViewById(R.id.myButtonAdd)
         myButtonUpdate = findViewById(R.id.myButtomEdit)
         myButtonDel = findViewById(R.id.myButtomDel)
-        myDialog = Dialog(controller)
+        myDialog = Dialog()
 
         myDialog.setListener(this)
         myButtonAdd.setOnClickListener{
@@ -55,11 +53,11 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
     }
 
 
-    override fun ClientAdd(id: Int, name: String){
-        val newClient = Client (id, name)
-        controller.ClientAddController(newClient)
-        var msg =  "El cliente con id = $id, ha sido insertado correctamente"
 
+    override fun ClientAdd(id: Int, name: String, lastName: String, phone: String) {
+        val newClient = Client(id, name, lastName, phone)
+        controller.ClientAddController(newClient)
+        var msg = "El cliente con id = $id, ha sido insertado correctamente"
         Log.d(TAG, msg)
         showConsoleData(msg)
     }
@@ -79,19 +77,16 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
     }
 
 
-
-    override fun ClientUpdate(id: Int, name: String) {
+    override fun ClientUpdate(id: Int, name: String, lastName: String, phone: String) {
         var msg = ""
-        val update = controller.ClientUpdateController(id, name)
-
-        if (update)
-            msg =  "El cliente con id = $id, ha sido eliminado correctamente"
-        else
-            msg = "El cliente con id = $id, no ha sido encontrado para eliminar"
-
-        Log. d(TAG, msg)
+        val update = controller.ClientUpdateController(id, name, lastName, phone)
+        if (update) {
+            msg = "El cliente con id = $id, ha sido actualizado correctamente"
+        } else {
+            msg = "El cliente con id = $id, no ha sido encontrado para actualizar"
+        }
+        Log.d(TAG, msg)
         showConsoleData(msg)
-
     }
 
     fun showConsoleData(msg:String){
