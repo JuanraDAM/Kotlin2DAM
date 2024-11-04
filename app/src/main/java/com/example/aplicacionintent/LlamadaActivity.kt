@@ -32,7 +32,7 @@ class LlamadaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sos_call)
 
-        // Asegúrate de usar el mismo nombre de SharedPreferences
+
         val sharedPreferences = getSharedPreferences("UserInfo", MODE_PRIVATE)
         numeroEmergencia = sharedPreferences.getString("numeroEmergencia", null) ?: ""
 
@@ -63,6 +63,7 @@ class LlamadaActivity : AppCompatActivity() {
         }
     }
 
+    //Metodo que realiza la llamada al numero pasado con el put extra
     private fun realizarLlamada() {
         if (numeroEmergencia.isNotEmpty()) {
             val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$numeroEmergencia"))
@@ -72,6 +73,7 @@ class LlamadaActivity : AppCompatActivity() {
         }
     }
 
+    //Metodo que carga las preferencias compartidas
     private fun loadUserInfoFooter() {
         val sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE)
         val userName = sharedPreferences.getString("USER_NAME", "Nombre no disponible")

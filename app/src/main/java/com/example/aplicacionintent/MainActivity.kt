@@ -88,6 +88,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        //Lógica para abrir la aplicación de alarmas
         alarmRedirect.setOnClickListener {
             try {
                 val intent = Intent(AlarmClock.ACTION_SHOW_ALARMS)
@@ -104,6 +105,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //Metodo que carga las preferencias compartidas
     private fun loadUserInfoFooter() {
         val userName = sharedPreferences.getString("USER_NAME", "Nombre no disponible")
         val userEmail = sharedPreferences.getString("USER_EMAIL", "Correo no disponible")

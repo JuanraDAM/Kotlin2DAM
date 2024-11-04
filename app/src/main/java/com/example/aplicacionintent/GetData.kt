@@ -19,7 +19,7 @@ class GetData : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_get_data)
 
-        // Inicializar los elementos de la UI
+        // Inicializamos los elementos de la UI
         editTextName = findViewById(R.id.editTextName)
         editTextEmail = findViewById(R.id.editTextEmail)
         val btnSaveUserInfo: Button = findViewById(R.id.btnSaveUserInfo)
@@ -66,6 +66,7 @@ class GetData : AppCompatActivity() {
         editor.apply()
     }
 
+    //Metodo que carga las preferencias compartidas
     private fun loadUserInfo() {
         val name = sharedPreferences.getString("USER_NAME", "")
         val email = sharedPreferences.getString("USER_EMAIL", "")
