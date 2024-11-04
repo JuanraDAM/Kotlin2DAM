@@ -10,11 +10,23 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+
 
 class LlamadaActivity : AppCompatActivity() {
     private lateinit var numeroEmergencia: String
+
+    // Registramos el launcher para la solicitud de permisos
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                realizarLlamada()
+            } else {
+                Toast.makeText(this, "Permiso de llamada denegado", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +41,7 @@ class LlamadaActivity : AppCompatActivity() {
 
         val btnLlamar: ImageView = findViewById(R.id.Sos_call_button)
         btnLlamar.setOnClickListener {
-            realizarLlamada()
+            checkPermissionAndCall()
         }
 
         val btnCambiarNumero: Button = findViewById(R.id.change_phone_number_Button)
@@ -41,23 +53,22 @@ class LlamadaActivity : AppCompatActivity() {
         loadUserInfoFooter()
     }
 
-    private fun realizarLlamada() {
-        if (numeroEmergencia.isNotEmpty()) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CALL_PHONE), 1)
-            } else {
-                val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$numeroEmergencia"))
-                startActivity(intent)
-            }
+    private fun checkPermissionAndCall() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            // Si el permiso no ha sido concedido, lo solicitamos
+            requestPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
         } else {
-            Toast.makeText(this, "No se ha configurado un número de emergencia", Toast.LENGTH_SHORT).show()
+            // Si ya tiene el permiso, realizar la llamada
+            realizarLlamada()
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            realizarLlamada()
+    private fun realizarLlamada() {
+        if (numeroEmergencia.isNotEmpty()) {
+            val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$numeroEmergencia"))
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "No se ha configurado un número de emergencia", Toast.LENGTH_SHORT).show()
         }
     }
 
