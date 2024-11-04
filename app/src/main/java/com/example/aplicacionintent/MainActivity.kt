@@ -10,6 +10,7 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -26,32 +27,36 @@ class MainActivity : AppCompatActivity() {
         val userName = sharedPreferences.getString("USER_NAME", null)
         val userEmail = sharedPreferences.getString("USER_EMAIL", null)
 
-        Log.d("MainActivity", "Nombre de usuario: $userName, Correo: $userEmail")
-
         // Si no hay usuario ni correo, redirigir a GetData
         if (userName == null || userEmail == null) {
-            Log.d("MainActivity", "Redirigiendo a GetData")
             startActivity(Intent(this, GetData::class.java))
-            finish()
-            return
+            finish() // Termina MainActivity para no regresar a ella
+            return // Salir del método onCreate para evitar ejecutar el resto del código
         }
 
         // Comprobar si hay un número de teléfono guardado
         val phoneNumber = sharedPreferences.getString("numeroEmergencia", null)
 
-        Log.d("MainActivity", "Número de teléfono: $phoneNumber")
-
         // Si no hay número de teléfono, redirigir a ConfiguracionActivity
         if (phoneNumber == null) {
-            Log.d("MainActivity", "Redirigiendo a ConfiguracionActivity")
             startActivity(Intent(this, ConfiguracionActivity::class.java))
-            finish()
-            return
+            finish() // Termina MainActivity para no regresar a ella
+            return // Salir del método onCreate para evitar ejecutar el resto del código
         }
 
+        // Aquí va el resto de la lógica de MainActivity, como los clics de los botones
         setupButtonActions()
         loadUserInfoFooter()
+
+        // Manejar el clic del botón para cambiar datos de usuario
+        val btnChangeUserData: Button = findViewById(R.id.btnChangeUserData)
+        btnChangeUserData.setOnClickListener {
+            val intent = Intent(this, GetData::class.java)
+            startActivity(intent)
+            finish() // Opcional: puedes terminar MainActivity si no quieres regresar a ella
+        }
     }
+
     private fun setupButtonActions() {
         val callRedirect: ImageView = findViewById(R.id.call_redirect)
         val urlRedirect: ImageView = findViewById(R.id.url_redirect)
