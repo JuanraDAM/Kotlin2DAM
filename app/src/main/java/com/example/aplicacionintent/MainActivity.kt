@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.provider.AlarmClock
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -94,6 +95,12 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Toast.makeText(this, "No se encontró ninguna aplicación de alarma.", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        val btnCambiarNumero: Button = findViewById(R.id.btnChangeUserData)
+        btnCambiarNumero.setOnClickListener {
+            val intent = Intent(this, GetData::class.java)
+            startActivity(intent)
         }
     }
 
