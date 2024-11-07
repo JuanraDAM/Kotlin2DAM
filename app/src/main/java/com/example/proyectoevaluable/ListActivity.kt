@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -41,8 +42,12 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun setUpRecyclerView() {
+        // Configura un LayoutManager (LinearLayoutManager para una lista vertical)
+        recyclerView?.layoutManager = LinearLayoutManager(this)
+
         // Crear el adaptador para el RecyclerView, pasando usuario y contraseña
-        val adapter: MyAdapter = MyAdapter(user, password)
-        recyclerView!!.adapter = adapter
+        val adapter = MyAdapter(user, password)
+        recyclerView?.adapter = adapter
     }
+
 }

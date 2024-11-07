@@ -33,7 +33,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public int getItemCount() {
-        return 1; // Suponiendo que solo necesitas un CardView para mostrar la información
+        return 2; // Suponiendo que solo necesitas un CardView para mostrar la información
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
@@ -46,4 +46,5 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             weightTextView = itemView.findViewById(R.id.item_weight);
         }
     }
+
 }

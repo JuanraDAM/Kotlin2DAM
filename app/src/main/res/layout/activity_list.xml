@@ -11,14 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="#00BCD4"
+        android:gravity="center_vertical"
+        android:background="#00D8E6"
         android:padding="16dp">
 
         <ImageButton
             android:id="@+id/button_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/icons8_men__24"
             android:contentDescription="Menú"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_marginEnd="8dp"
@@ -27,11 +28,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
             android:text="PescaPro"
             android:textColor="#000000"
-            android:textStyle="bold"
             android:textSize="20sp"
-            android:fontFamily="sans-serif-medium" />
+            android:textStyle="bold" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -48,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
-        android:background="#00BCD4"
+        android:background="#00D8E6"
         android:orientation="horizontal"
         android:gravity="center">
 
@@ -66,17 +67,17 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:src="@drawable/icons8_exterior_30"
-            android:contentDescription="Inicio" />
+            android:contentDescription="home" />
 
 
 
-    <ImageView
-        android:id="@+id/nav_home"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:src="@drawable/icons8_informaci_n_30"
-        android:contentDescription="Inicio"/>
+        <ImageView
+            android:id="@+id/nav_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/icons8_informaci_n_30"
+            android:contentDescription="info"/>
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -87,7 +88,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="60dp"
-        android:backgroundTint="#00D8E6"
+        android:background="@drawable/button_background_selector"
         android:src="@android:drawable/ic_input_add"
         android:contentDescription="Agregar" />
 </RelativeLayout>

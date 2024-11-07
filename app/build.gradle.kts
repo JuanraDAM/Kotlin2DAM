@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.proyectoevaluable"
-        minSdk = 34
+        minSdk = 30 // Cambiado a un SDK mínimo más bajo
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

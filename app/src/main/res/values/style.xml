@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<style name="CircularImage" parent="ShapeAppearance.MaterialComponents.SmallComponent">
-    <item name="cornerFamily">rounded</item>
-    <item name="cornerSize">50%"</item> <!-- El 50% hace que la imagen sea completamente circular -->
-</style>
