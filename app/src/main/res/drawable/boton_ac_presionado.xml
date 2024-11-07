@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <gradient
+        android:startColor="@color/color_botones_numeros_presionado"
+        android:endColor="@color/color_botones_numeros"
+        android:angle="2"/>
+
+    <stroke
+        android:width="2dp"
+        android:color="#9b913e"/>
+
+    <corners
+        android:radius="20dp"/>
+
+    <padding
+        android:left="1dp"
+        android:right="1dp"
+        android:top="1dp"
+        android:bottom="1dp"/>
+</shape>

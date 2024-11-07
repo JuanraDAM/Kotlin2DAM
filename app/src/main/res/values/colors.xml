@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+
+    <color name="color_botones_numeros">#191919</color>
+    <color name="color_botones_numeros_presionado">#0034FF</color>
+    <color name="borde_botones_numeros">#FFD000</color>
+    <color name="borde_botones_numeros_presionado">#F200FF</color>
+
+    <color name="color_botones_operaciones">#6485CAFF</color>
+    <color name="color_botones_operaciones_presionado">#00FFDD</color>
+    <color name="borde_botones_operaciones">#FFD000</color>
+    <color name="borde_botones_operaciones_presionado">#F200FF</color>
+</resources>
