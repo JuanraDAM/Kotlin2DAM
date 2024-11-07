@@ -54,7 +54,7 @@
             android:id="@+id/edit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icons8_editar_24"
+            android:src="@drawable/edit_ic"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Edit"/>
 
@@ -62,7 +62,7 @@
             android:id="@+id/delete_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icons8_remove_24"
+            android:src="@drawable/remove_ic"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Delete"/>
     </LinearLayout>

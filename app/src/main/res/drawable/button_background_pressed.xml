@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Definir los bordes del botón para que sea ovalado -->
-    <solid android:color="@color/color_button_default"/>  <!-- Color por defecto -->
+    <solid android:color="@color/color_button_pressed"/>  <!-- Color por defecto -->
     <corners android:radius="25dp"/>  <!-- Bordes redondeados (ovalados) -->
 </shape>

@@ -19,7 +19,7 @@
             android:id="@+id/button_menu"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/icons8_men__24"
+            android:src="@drawable/burguer_menu_ic"
             android:contentDescription="Menú"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_marginEnd="8dp"
@@ -59,14 +59,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="Perfil"
-            android:src="@drawable/icons8_invitado_masculino_30" />
+            android:src="@drawable/user_ic" />
 
         <ImageView
             android:id="@+id/nav_home"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/icons8_exterior_30"
+            android:src="@drawable/home_ic"
             android:contentDescription="home" />
 
 
@@ -76,7 +76,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/icons8_informaci_n_30"
+            android:src="@drawable/info_ic"
             android:contentDescription="info"/>
     </LinearLayout>
 
@@ -88,7 +88,11 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="60dp"
-        android:background="@drawable/button_background_selector"
+        android:backgroundTint="@color/color_button_default"
+        app:tint="@color/black"
         android:src="@android:drawable/ic_input_add"
         android:contentDescription="Agregar" />
+
+
+
 </RelativeLayout>
