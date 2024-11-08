@@ -46,7 +46,7 @@ class ListActivity : AppCompatActivity() {
         recyclerView?.layoutManager = LinearLayoutManager(this)
 
         // Crear el adaptador para el RecyclerView, pasando usuario y contraseña
-        val adapter = MyAdapter(user, password)
+        val adapter = MyAdapter(user!!, password!!)
         recyclerView?.adapter = adapter
     }
 

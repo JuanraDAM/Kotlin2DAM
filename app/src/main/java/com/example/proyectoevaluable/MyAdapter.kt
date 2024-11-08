@@ -1,50 +1,31 @@
-package com.example.proyectoevaluable;
+package com.example.proyectoevaluable
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+class MyAdapter(private val user: String, private val password: String) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
-    private String user;
-    private String password;
-
-    public MyAdapter(String user, String password) {
-        this.user = user;
-        this.password = password;
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_card, parent, false)
+        return MyViewHolder(view)
     }
 
-    @NonNull
-    @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_card, parent, false);
-        return new MyViewHolder(view);
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        holder.titleTextView.text = "Información del usuario"
+        holder.descriptionTextView.text = "Usuario: $user\nContraseña: $password"
+        holder.weightTextView.text = "Peso: --" // Puedes personalizar este campo según sea necesario
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.titleTextView.setText("Información del usuario");
-        holder.descriptionTextView.setText("Usuario: " + user + "\nContraseña: " + password);
-        holder.weightTextView.setText("Peso: --"); // Puedes personalizar este campo según sea necesario
+    override fun getItemCount(): Int {
+        return 2 // Suponiendo que solo necesitas un CardView para mostrar la información
     }
 
-    @Override
-    public int getItemCount() {
-        return 2; // Suponiendo que solo necesitas un CardView para mostrar la información
+    class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val titleTextView: TextView = itemView.findViewById(R.id.item_title)
+        val descriptionTextView: TextView = itemView.findViewById(R.id.item_description)
+        val weightTextView: TextView = itemView.findViewById(R.id.item_weight)
     }
-
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView, descriptionTextView, weightTextView;
-
-        public MyViewHolder(@NonNull View itemView) {
-            super(itemView);
-            titleTextView = itemView.findViewById(R.id.item_title);
-            descriptionTextView = itemView.findViewById(R.id.item_description);
-            weightTextView = itemView.findViewById(R.id.item_weight);
-        }
-    }
-
 }
