@@ -51,6 +51,22 @@ class MainActivity : AppCompatActivity() {
         val urlRedirect: ImageView = findViewById(R.id.url_redirect)
         val mailRedirect: ImageView = findViewById(R.id.mail_redirect)
         val alarmRedirect: ImageView = findViewById(R.id.alarm_redirect)
+        val btnChistes: ImageView = findViewById(R.id.btnChistes)
+        val btnDados: ImageView = findViewById(R.id.btnDados)
+        val btnSpinner: ImageView = findViewById(R.id.btnSpinner)
+
+        btnChistes.setOnClickListener {
+            startActivity(Intent(this, ChistesActivity::class.java))
+        }
+
+        btnDados.setOnClickListener {
+            startActivity(Intent(this, DadosActivity::class.java))
+        }
+
+        btnSpinner.setOnClickListener {
+            startActivity(Intent(this, SpinerActivity::class.java))
+        }
+
 
         // Configurar el intent para llamar a LlamadaActivity pasando el número de teléfono
         callRedirect.setOnClickListener {
@@ -110,7 +126,11 @@ class MainActivity : AppCompatActivity() {
         val userName = sharedPreferences.getString("USER_NAME", "Nombre no disponible")
         val userEmail = sharedPreferences.getString("USER_EMAIL", "Correo no disponible")
 
-        val userInfoFooter = findViewById<TextView>(R.id.userInfoFooter)
-        userInfoFooter.text = "Usuario: $userName | Correo: $userEmail"
+        val userNameView = findViewById<TextView>(R.id.userName)
+        val userEmailView = findViewById<TextView>(R.id.userEmail)
+
+        userNameView.text = "Usuario: $userName"
+        userEmailView.text = "Correo: $userEmail"
     }
+
 }

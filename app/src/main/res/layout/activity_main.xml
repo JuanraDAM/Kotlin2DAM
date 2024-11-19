@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -8,99 +9,207 @@
     android:background="@color/white"
     tools:context=".MainActivity">
 
+    <!-- Toolbar personalizada -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#0048FF"
-        android:titleTextColor="#FFFFFF"
+        android:paddingVertical="16dp"
+        android:minHeight="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-    <ImageView
-        android:id="@+id/call_redirect"
-        android:layout_width="95dp"
-        android:layout_height="78dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.319"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.652"
-        app:srcCompat="@drawable/gratis_png_icono_de_llamada_azul_marcador_android_telefono_de_google_play_telefono" />
+        <!-- Contenido dentro de la Toolbar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
 
-    <ImageView
-        android:id="@+id/url_redirect"
-        android:layout_width="99dp"
-        android:layout_height="78dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.705"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.652"
-        app:srcCompat="@drawable/_392865" />
+            <!-- Logo dentro de la Toolbar -->
+            <ImageView
+                android:id="@+id/logoAndroid"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:contentDescription="Logo de la aplicación"
+                app:srcCompat="@drawable/logo" />
 
-    <ImageView
-        android:id="@+id/mail_redirect"
-        android:layout_width="96dp"
-        android:layout_height="80dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.32"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.774"
-        app:srcCompat="@drawable/sin_t_tulo" />
+            <!-- Texto: Soy el Profe -->
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Soy el Alumno de PMDM"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="8dp" />
 
-    <ImageView
-        android:id="@+id/logoAndroid"
+            <!-- Texto: Te estoy observando -->
+            <TextView
+                android:id="@+id/subtitleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Te estoy observando"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- GridLayout para los botones -->
+    <GridLayout
+        android:id="@+id/buttonsGrid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        android:layout_marginTop="16dp"
+        android:rowCount="3"
+        android:columnCount="3"
+        android:alignmentMode="alignMargins"
+        android:layout_gravity="center"
+        android:columnOrderPreserved="true"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.239"
-        app:srcCompat="@drawable/images" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:id="@+id/alarm_redirect"
-        android:layout_width="99dp"
-        android:layout_height="78dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.705"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="0.771"
-        app:srcCompat="@drawable/clock_30023" />
+        <!-- Primera fila: 3 botones -->
+        <ImageView
+            android:id="@+id/call_redirect"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="8dp"
+            app:srcCompat="@drawable/llamada"
+            android:contentDescription="Llamar"
+            android:layout_gravity="center" />
 
-    <TextView
-        android:id="@+id/userInfoFooter"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:padding="8dp"/>
+        <ImageView
+            android:id="@+id/mail_redirect"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="8dp"
+            app:srcCompat="@drawable/mail"
+            android:contentDescription="Email"
+            android:layout_gravity="center" />
 
+        <ImageView
+            android:id="@+id/url_redirect"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="8dp"
+            app:srcCompat="@drawable/url"
+            android:contentDescription="Navegador"
+            android:layout_gravity="center" />
+
+        <!-- Segunda fila: 3 botones -->
+        <ImageView
+            android:id="@+id/alarm_redirect"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="8dp"
+            app:srcCompat="@drawable/alarm"
+            android:contentDescription="Alarmas"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/btnChistes"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="8dp"
+            app:srcCompat="@drawable/chiste"
+            android:contentDescription="Chistes"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/btnDados"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="8dp"
+            app:srcCompat="@drawable/dado_app"
+            android:contentDescription="Dados"
+            android:layout_gravity="center" />
+
+        <!-- Tercera fila: 1 botón centrado -->
+        <ImageView
+            android:id="@+id/btnSpinner"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="8dp"
+            app:srcCompat="@drawable/spinner"
+            android:contentDescription="Spinner"
+            android:layout_rowSpan="1"
+            android:layout_columnSpan="3"
+            android:layout_gravity="center" />
+    </GridLayout>
+
+    <!-- Botón Cambiar Datos Usuario -->
     <Button
         android:id="@+id/btnChangeUserData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="56dp"
-        android:backgroundTint="@color/blue"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
         android:text="Cambiar Datos Usuario"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:backgroundTint="#0048FF"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@+id/buttonsGrid"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- CardView para datos del usuario -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/userCardView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@+id/btnChangeUserData"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cardPreventCornerOverlap="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="@drawable/border_black">
+
+            <!-- Imagen de usuario -->
+            <ImageView
+                android:id="@+id/userImage"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/logo"
+                android:contentDescription="Imagen del usuario"
+                android:layout_marginEnd="16dp" />
+
+            <!-- Información del usuario -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/userName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Usuario: Nombre no disponible"
+                    android:textSize="16sp"
+                    android:textColor="#000000" />
+
+                <TextView
+                    android:id="@+id/userEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Correo: Correo no disponible"
+                    android:textSize="16sp"
+                    android:textColor="#000000" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
