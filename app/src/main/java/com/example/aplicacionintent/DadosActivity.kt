@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import kotlin.random.Random
 
@@ -16,6 +17,7 @@ class DadosActivity : AppCompatActivity() {
     private lateinit var imgDado1: ImageView
     private lateinit var imgDado2: ImageView
     private lateinit var btnLanzar: Button
+    private lateinit var btnRegresar: Button
     private var objetivo: Int = 0
     private lateinit var handler: Handler
 
@@ -27,6 +29,8 @@ class DadosActivity : AppCompatActivity() {
         imgDado1 = findViewById(R.id.imgDado1)
         imgDado2 = findViewById(R.id.imgDado2)
         btnLanzar = findViewById(R.id.btnLanzar)
+        btnRegresar = findViewById(R.id.btnRegresar)
+        btnRegresar.setBackgroundColor(Color.GRAY)
 
         // Inicializamos el handler después de que el contexto está completamente disponible
         handler = Handler(Looper.getMainLooper())
@@ -46,6 +50,17 @@ class DadosActivity : AppCompatActivity() {
             // Crear y ejecutar el hilo para lanzar los dados
             LanzadorDeDados(handler, this, objetivo).start()
         }
+
+        // Inicialmente deshabilitamos el botón "Volver al Menú"
+        btnRegresar.isEnabled = false
+
+        // Configuramos el evento de clic en el botón "Regresar"
+        btnRegresar.setOnClickListener {
+            // Volver al MainActivity
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish() // Terminamos la actividad actual
+        }
     }
 
     // Método público para acceder a las imágenes de los dados
@@ -59,12 +74,16 @@ class DadosActivity : AppCompatActivity() {
     fun actualizarBoton(alcanzado: Boolean) {
         Log.d("DadosActivity", "Actualizando estado del botón")  // Log cuando se actualiza el botón
         if (alcanzado) {
+            // Objetivo alcanzado, habilitar botón para volver al menú
             btnLanzar.setBackgroundColor(Color.GRAY)
             btnLanzar.setTextColor(Color.WHITE) // Opcional: cambiar el color del texto
             btnLanzar.isEnabled = false
-            Toast.makeText(this, "¡Objetivo alcanzado! El botón se ha desactivado.", Toast.LENGTH_LONG).show()
+            btnRegresar.isEnabled = true // Habilitar el botón de regreso
+            btnRegresar.setBackgroundColor(Color.BLUE)
+            Toast.makeText(this, "¡Objetivo alcanzado! El botón se ha habilitado para regresar al menú.", Toast.LENGTH_LONG).show()
         } else {
             btnLanzar.isEnabled = true
+            btnRegresar.isEnabled = false // Deshabilitar el botón de regreso si el objetivo no es alcanzado
         }
     }
 

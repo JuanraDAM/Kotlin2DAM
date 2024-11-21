@@ -1,5 +1,6 @@
 package com.example.aplicacionintent
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -9,23 +10,35 @@ class SpinerActivity : AppCompatActivity() {
     private lateinit var autoCompleteTextView: AutoCompleteTextView
     private lateinit var spinnerOpciones: Spinner
     private lateinit var btnAceptar: Button
+    private lateinit var btnVolverSpiner: Button  // Botón Volver
     private lateinit var checkbox: CheckBox
     private lateinit var switchToggle: Switch
     private lateinit var toggleButton: ToggleButton
     private lateinit var radioGroup: RadioGroup
 
+    // Restante del código...
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_spiner)
 
-        // Inicialización de componentes
+        // Inicialización de los componentes
         autoCompleteTextView = findViewById(R.id.autoCompleteTextView)
         spinnerOpciones = findViewById(R.id.spinnerOpciones)
         btnAceptar = findViewById(R.id.btnAceptar)
+        btnVolverSpiner = findViewById(R.id.btnVolverSpiner)  // Inicializar botón Volver
         checkbox = findViewById(R.id.checkbox)
         switchToggle = findViewById(R.id.switchToggle)
         toggleButton = findViewById(R.id.toggleButton)
         radioGroup = findViewById(R.id.radioGroup)
+
+        // Configurar el botón Volver
+        btnVolverSpiner.setOnClickListener {
+            // Navegar a MainActivity
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()  // Finaliza la actividad actual
+        }
 
         // Configuración del AutoCompleteTextView con una lista de nombres
         val nombres = arrayOf("Juan", "Ana", "Carlos", "Pedro", "Maria", "Lucía", "Laura")

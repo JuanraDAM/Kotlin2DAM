@@ -1,5 +1,6 @@
 package com.example.aplicacionintent
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.speech.tts.TextToSpeech
@@ -12,6 +13,7 @@ class ChistesActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var txtChiste: TextView
     private lateinit var btnContarChiste: Button
     private lateinit var progressBar: ProgressBar
+    private lateinit var btnVolver: Button
     private lateinit var textToSpeech: TextToSpeech
 
     private val chistes = arrayOf(
@@ -31,7 +33,16 @@ class ChistesActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         // Inicialización de los componentes
         txtChiste = findViewById(R.id.txtChiste)
         btnContarChiste = findViewById(R.id.btnContarChiste)
+        btnVolver = findViewById(R.id.btnVolver)  // Botón Volver
         progressBar = findViewById(R.id.progressBar)
+
+        // Configurar el botón Volver
+        btnVolver.setOnClickListener {
+            // Navegar a MainActivity
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()  // Finaliza la actividad actual
+        }
 
         // Inicializar TextToSpeech
         textToSpeech = TextToSpeech(this, this)
