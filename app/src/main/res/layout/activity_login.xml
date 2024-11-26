@@ -70,7 +70,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:hint="Introduce la contraseña"
-        android:inputType="text"
+        android:inputType="textPassword"
         android:textColorHint="@color/black"
         android:background="@drawable/custom_edittext_background"
         android:padding="16dp"

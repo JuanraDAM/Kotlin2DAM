@@ -1,13 +1,12 @@
 package com.example.proyectoevaluable
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
 class LoginActivity : AppCompatActivity() {
     // Definir constantes
@@ -31,10 +30,7 @@ class LoginActivity : AppCompatActivity() {
             // Verificar usuario y contraseña
             if (MYUSER == enteredUser && MYPASS == enteredPass) {
                 // Usuario y contraseña son correctos
-                val intent = Intent(
-                    this@LoginActivity,
-                    ListActivity::class.java
-                )
+                val intent = Intent(this@LoginActivity, ListActivity::class.java)
                 // Pasar datos a la siguiente actividad
                 intent.putExtra("USERNAME", enteredUser)
                 intent.putExtra("PASSWORD", enteredPass)
