@@ -62,7 +62,9 @@ class ListActivity : AppCompatActivity() {
         items.add(card)
         saveCardsData(items) // Guardar los datos al añadir una tarjeta
         adapter?.notifyItemInserted(items.size - 1) // Notificar al adaptador que se ha añadido una tarjeta
+        recyclerView.scrollToPosition(items.size - 1) // Hacer scroll al final
     }
+
 
     private fun deleteCard(position: Int) {
         if (position >= 0 && position < items.size) {
