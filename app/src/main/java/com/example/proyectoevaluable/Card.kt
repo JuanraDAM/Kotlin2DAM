@@ -1,7 +1,8 @@
 package com.example.proyectoevaluable
 
 data class Card(
-    val username: String,
-    val password: String
+    var username: String,
+    var password: String,
+    var weight: String? = null,
+    var photoUri: String? = null
 )
-
