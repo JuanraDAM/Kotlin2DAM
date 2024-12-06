@@ -42,8 +42,8 @@
             android:layout_marginBottom="16dp"
             android:contentDescription="Seleccionar foto"
             android:scaleType="centerInside"
-            android:src="@drawable/apertura_imagen" />
+            android:src="@drawable/apertura_imagen"
+            android:background="@drawable/rounded_image_background" />
 
     </LinearLayout>
 </ScrollView>
-

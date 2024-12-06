@@ -42,14 +42,17 @@ class CardDialogFragment(
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(requireContext())
         val inflater = requireActivity().layoutInflater
+
+        // Inflar el layout personalizado
         val view = inflater.inflate(R.layout.dialog_card, null)
 
+        // Obtener las referencias a los elementos de vista
         val titleEditText: EditText = view.findViewById(R.id.titleEditText)
         val descriptionEditText: EditText = view.findViewById(R.id.descriptionEditText)
         val weightEditText: EditText = view.findViewById(R.id.weightEditText)
         val selectPhotoImageView: ImageView = view.findViewById(R.id.selectPhotoImageView)
 
-        // Inicializar valores
+        // Inicializar los campos con datos iniciales
         titleEditText.setText(initialTitle)
         descriptionEditText.setText(initialDescription)
         weightEditText.setText(initialWeight)
@@ -59,10 +62,12 @@ class CardDialogFragment(
             selectPhotoImageView.setImageURI(photoUri)
         }
 
+        // Configurar el listener para seleccionar foto
         selectPhotoImageView.setOnClickListener {
             showImagePickerOptions()
         }
 
+        // Aplicar el layout personalizado al diálogo
         builder.setView(view)
             .setTitle(if (initialTitle == null) "Añadir Tarjeta" else "Editar Tarjeta")
             .setPositiveButton("Guardar") { _, _ ->
@@ -75,8 +80,15 @@ class CardDialogFragment(
                 dialog.dismiss()
             }
 
-        return builder.create()
+        // Crear el diálogo
+        val dialog = builder.create()
+
+        // Aplicar estilos al fondo del diálogo
+        dialog.window?.setBackgroundDrawableResource(R.drawable.dialog_card_border)
+
+        return dialog
     }
+
 
     private fun showImagePickerOptions() {
         val options = arrayOf("Abrir cámara", "Seleccionar de la galería")
