@@ -12,39 +12,48 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.google.firebase.auth.FirebaseAuth
 
 class ListActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private var adapter: MyAdapter? = null
     private var items: MutableList<Card> = mutableListOf()
-    private lateinit var currentUser: String
-    private lateinit var currentPassword: String
+    private lateinit var currentUserUid: String // UID del usuario actual
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-        // Obtener los datos del usuario y contraseña pasados desde LoginActivity
-        currentUser = intent.getStringExtra("USERNAME") ?: "UsuarioDesconocido"
-        currentPassword = intent.getStringExtra("PASSWORD") ?: "ContraseñaDesconocida"
+        // Obtener UID del usuario actual autenticado
+        val firebaseUser = FirebaseAuth.getInstance().currentUser
+        if (firebaseUser != null) {
+            currentUserUid = firebaseUser.uid
+        } else {
+            // Si no hay un usuario autenticado, redirigir a la pantalla de inicio de sesión
+            val loginIntent = Intent(this, LoginActivity::class.java)
+            startActivity(loginIntent)
+            finish()
+            return
+        }
 
         recyclerView = findViewById(R.id.recyclerView)
 
-        // Cargar los datos guardados de SharedPreferences
+        // Cargar los datos guardados para el usuario actual
         items = loadCardsData().toMutableList()
 
-        // Configurar el RecyclerView
+        // Configurar RecyclerView
         setUpRecyclerView()
 
-        // Configurar el botón de perfil
+        // Botón de perfil
         val profileButton = findViewById<ImageView>(R.id.nav_profile)
         profileButton.setOnClickListener {
+            FirebaseAuth.getInstance().signOut() // Cerrar sesión
             val loginIntent = Intent(this@ListActivity, LoginActivity::class.java)
             startActivity(loginIntent)
             finish()
         }
 
-        // Configurar el botón flotante para añadir más tarjetas
+        // Botón flotante para añadir tarjetas
         val addButton = findViewById<FloatingActionButton>(R.id.button_add)
         addButton.setOnClickListener {
             showAddCardDialog()
@@ -105,19 +114,21 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun saveCardsData(cardsList: List<Card>) {
+        // Guardar datos usando una clave única por usuario (UID)
         val sharedPreferences: SharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val gson = Gson()
-        val json = gson.toJson(cardsList) // Convertir lista de Cards a JSON
-        editor.putString("cards_data", json)
+        val json = gson.toJson(cardsList)
+        editor.putString("cards_data_$currentUserUid", json) // Clave única con UID
         editor.apply()
     }
 
     private fun loadCardsData(): List<Card> {
+        // Cargar datos específicos del usuario actual
         val sharedPreferences: SharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         val gson = Gson()
-        val json = sharedPreferences.getString("cards_data", null)
-        val type = object : TypeToken<List<Card>>() {}.type // Cargar lista de Cards desde JSON
+        val json = sharedPreferences.getString("cards_data_$currentUserUid", null) // Clave única con UID
+        val type = object : TypeToken<List<Card>>() {}.type
         return if (json != null) {
             gson.fromJson(json, type)
         } else {
