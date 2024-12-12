@@ -2,10 +2,13 @@ package com.example.proyectoevaluable
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.UnderlineSpan
 import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -59,9 +62,18 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        val recoverPasswordButton = findViewById<Button>(R.id.recoverPasswordButton)
-        recoverPasswordButton.setOnClickListener {
-            val email = emailEditText.text.toString().trim()
+        // Configuración del TextView que se ve como un hipervínculo
+        val recoverPasswordText: TextView = findViewById(R.id.recoverPasswordText)
+
+        // Aplica el subrayado al texto
+        val content = SpannableString("Recuperar contraseña")
+        content.setSpan(UnderlineSpan(), 0, content.length, 0)
+        recoverPasswordText.text = content
+
+        // Configuración del OnClickListener
+        recoverPasswordText.setOnClickListener {
+            // Lógica para la recuperación de la contraseña
+            val email = emailEditText.text.toString().trim() // Asegúrate de tener emailEditText correctamente definido
             recoverPassword(email)
         }
 

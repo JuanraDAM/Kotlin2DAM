@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:paddingBottom="40dp"
     tools:context=".LoginActivity">
 
     <!-- Toolbar -->
@@ -33,7 +34,6 @@
             android:textStyle="bold"
             android:textSize="20sp"
             android:fontFamily="sans-serif-medium" />
-
     </androidx.appcompat.widget.Toolbar>
 
     <!-- Logo -->
@@ -63,7 +63,6 @@
         android:alpha="0.8"
         android:scrollHorizontally="false" />
 
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -85,7 +84,7 @@
             android:scrollHorizontally="false"
             android:layout_alignParentTop="true"/>
 
-        <!-- Botón de mostrar/ocultar la contraseña, a la derecha y centrado verticalmente -->
+        <!-- Botón de mostrar/ocultar la contraseña -->
         <ImageButton
             android:id="@+id/showPasswordButton"
             android:layout_width="40dp"
@@ -96,8 +95,6 @@
             android:contentDescription="Mostrar contraseña"
             android:background="?attr/selectableItemBackgroundBorderless" />
     </RelativeLayout>
-
-
 
     <!-- Register and Login Buttons -->
     <LinearLayout
@@ -116,10 +113,7 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             app:backgroundTint="@null"
-            android:background="@drawable/button_background_selector"/> <!-- Aplica el selector de fondo con la forma ovalada -->
-
-
-
+            android:background="@drawable/button_background_selector"/>
 
         <Button
             android:id="@+id/loginButton"
@@ -130,22 +124,19 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             app:backgroundTint="@null"
-            android:background="@drawable/button_background_selector" /> <!-- Aplica el selector directamente -->
-
-
+            android:background="@drawable/button_background_selector" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/recoverPasswordButton"
+    <!-- Texto que parece un hipervínculo para recuperar contraseña -->
+    <TextView
+        android:id="@+id/recoverPasswordText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="90dp"
         android:text="Recuperar contraseña"
-        android:textColor="@color/black"
+        android:textColor="@color/color_button_default"
         android:textStyle="bold"
-        app:backgroundTint="@null"
-        android:background="@drawable/button_background_selector"/>
-
-
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp" />
 </LinearLayout>
