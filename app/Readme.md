@@ -1,131 +1,67 @@
-# Proyecto Android: PescaPro
+# Proyecto “PescaPro”
 
-Actualmente la aplicación **PescaPro**, no esta completa, simplemente es un simple login de momento
-## Tabla de Contenidos
+Esta aplicación está desarrollada en Android (Kotlin) y permite:
 
-- [Proyecto Android: PescaPro](#proyecto-android-pescapro)
-  - [Tabla de Contenidos](#tabla-de-contenidos)
-  - [Vista Previa](#vista-previa)
-  - [Características](#características)
-  - [Estructura del Proyecto](#estructura-del-proyecto)
-    - [XML Layouts](#xml-layouts)
-    - [Activities](#activities)
+1. **Gestionar usuarios** (registro, login, logout) mediante Firebase Authentication.
+2. **Crear, editar y eliminar** tarjetas personalizadas (un CRUD básico) almacenadas en `SharedPreferences` de forma local.
+3. **Navegar** a través de un **Navigation Drawer**, con opciones como logout y vista de usuario.
+4. **Presentar** la información en una **lista (RecyclerView)** y utilizar un **DialogFragment** para añadir o editar tarjetas (con soporte de cámara y galería para fotos).
 
-## Vista Previa
+## Estructura de la aplicación
 
-Capturas de pantalla del inicio de sesión y lista de elementos se pueden agregar aquí para ilustrar la funcionalidad de la aplicación.
+1. **LoginActivity**
+    - Permite **iniciar sesión** o **registrar** un nuevo usuario.
+    - Verifica si el usuario ya está logueado o si el correo fue verificado.
+    - Incluye **recuperación de contraseña** a través de Firebase.
+    - Usa `FirebaseAuth` para la autenticación.
 
-## Características
+2. **ListActivity**
+    - Es la pantalla principal tras el login.
+    - Contiene un **Navigation Drawer** con opciones (CRUD, Lista Genérica, Logout...).
+    - Muestra en un **RecyclerView** las tarjetas (`Card`) guardadas para cada usuario.
+    - Permite **añadir** (FAB), **editar** y **eliminar** tarjetas.
+    - Gestiona las tarjetas mediante `SharedPreferences` (cada usuario tiene su propia clave).
 
-- **Inicio de Sesión**: Verificación básica de usuario y contraseña en la `LoginActivity`.
-- **Lista de Elementos**: Visualización de datos en un `RecyclerView` con un `CardView` personalizado para cada elemento.
-- **Navegación Simple**: Barra superior e inferior para facilitar la navegación dentro de la aplicación.
+3. **MyAdapter**
+    - Adaptador para el `RecyclerView`.
+    - Maneja la visualización de cada `Card`, con **botones para editar** (muestra un diálogo de edición) y **eliminar** (muestra alerta de confirmación).
+    - Soporta mostrar la foto de la tarjeta (o un logo por defecto), y ampliarla en un `AlertDialog`.
 
-## Estructura del Proyecto
+4. **CardDialogFragment**
+    - Se muestra como **diálogo** para **crear o editar** una tarjeta.
+    - Permite ingresar título, descripción, peso y foto.
+    - Opción de **abrir cámara** o **galería** para seleccionar la foto.
+    - Guarda la foto en almacenamiento interno y la convierte a `Uri`.
 
-### XML Layouts
+5. **UserFragment** (opcional, si implementaste la vista de usuario)
+    - Se muestra dentro del `ListActivity` (reemplazando un contenedor) para ver info del usuario, etc.
 
-1. **`activity_login.xml`** - Layout para la pantalla de inicio de sesión.
-    - Incluye un `Toolbar` personalizado con un ícono de menú y un título.
-    - Campos de entrada de usuario y contraseña (`EditText`).
-    - Botones de **Register** y **Login** personalizados con fondos selectores.
+6. **Card (data class)**
+    - Modelo de datos con `username`, `password`, `weight`, `photoUri`.
 
-2. **`activity_list.xml`** - Layout para la pantalla de lista de elementos.
-    - Contiene un `RecyclerView` para mostrar datos en tarjetas (`CardView`).
-    - Incluye una barra superior (`topBar`) y una barra de navegación inferior (`bottomNavigation`) con botones de navegación.
-    - Un `FloatingActionButton` para agregar elementos.
+## Dependencias principales
 
-3. **`item_card.xml`** - Layout para cada tarjeta individual en el `RecyclerView`.
-    - Contiene un `ImageView` para mostrar un ícono de elemento, y varios `TextView` para mostrar el título, descripción y peso.
+- **Firebase Auth** (`com.google.firebase:firebase-auth`) para el sistema de login/registro.
+- **Material Components** (`com.google.android.material:material`) para vistas y estilos modernos (NavigationView, FAB, etc.).
+- **Gson** (`com.google.code.gson:gson`) para serializar/deserializar las tarjetas en `SharedPreferences`.
 
-### Activities
+## Flujo de uso
 
-1. **`LoginActivity`**: Actividad principal para la autenticación del usuario.
-    - Campos y botón de inicio de sesión (`loginButton`) con lógica para verificar las credenciales:
-        - Usuario: `"usuario"`
-        - Contraseña: `"1234"`
-    - Al inicio de sesión exitoso, se redirige a `ListActivity` pasando el nombre de usuario y la contraseña como `Intent` extras.
+1. **Login/Register**: El usuario ingresa su email/contraseña en `LoginActivity`. Si es nuevo, se registra; si ya existe, hace login.
+2. **Verificación de correo**: Al registrarse, se envía un correo de verificación. Se requiere verificarlo antes de iniciar sesión.
+3. **Pantalla principal (ListActivity)**:
+    - Aparece la **lista de tarjetas** del usuario (vaciada si no tiene ninguna).
+    - El **Navigation Drawer** ofrece acciones (CRUD personalizado, Lista Genérica - que vuelve a esta misma pantalla, Logout, etc.).
+    - El **FAB** crea una nueva tarjeta (abre `CardDialogFragment`).
+    - Cada tarjeta tiene **botones** para editar o eliminar.
+    - Al pulsar en la **imagen**, se muestra en grande en un `AlertDialog`.
+4. **Al cerrar sesión** (`Logout`), se vuelve a `LoginActivity`.
 
-   ```kotlin
-   val intent = Intent(this@LoginActivity, ListActivity::class.java)
-   intent.putExtra("USERNAME", enteredUser)
-   intent.putExtra("PASSWORD", enteredPass)
-   startActivity(intent)
-   finish()
+## Cómo compilar y ejecutar
 
-2. **`ListActivity`**: Actividad que muestra una lista de elementos usando un RecyclerView
-       - Recibe el nombre de usuario y la contraseña desde `LoginActivity` a través de Intent extras.
-       - Configura el RecyclerView para mostrar la información del usuario autenticado en una lista de elementos utilizando el adaptador personalizado `MyAdapter`.
-       - Contiene una barra superior con un título (`PescaPro`) y un ícono de menú.
-       - Incluye una barra de navegación inferior con tres íconos (`nav_profile`, `nav_home`, `nav_info`):
-          - `nav_profile`: Al seleccionarlo, regresa al `LoginActivity`.
-
-
-
-    ```kotlin
-    // Obtener datos del Intent y configurar RecyclerView
-    val user = intent.getStringExtra("USERNAME")
-    val password = intent.getStringExtra("PASSWORD")
-
-    private fun setUpRecyclerView() {
-        recyclerView?.layoutManager = LinearLayoutManager(this)
-        val adapter = MyAdapter(user!!, password!!)
-        recyclerView?.adapter = adapter
-    }
-
-    // Configurar acción para el botón de perfil
-    profileButton.setOnClickListener {
-        val loginIntent = Intent(this@ListActivity, LoginActivity::class.java)
-        startActivity(loginIntent)
-        finish()
-    }
-
-3. **`MyAdapter`**: Adaptador personalizado para el RecyclerView en `ListActivity`
-   - El adaptador recibe los valores de `user` y `password` del usuario autenticado en su constructor, y los muestra en cada tarjeta de la lista.
-   - Usa un diseño de tarjeta (`CardView`) para mostrar los datos de cada usuario, incluyendo campos básicos como el título, descripción, y peso (personalizable).
-   - Cada tarjeta también incluye botones para editar y eliminar el elemento.
-
-    #### **Estructura de la tarjeta:**
-    - **Imagen de usuario** (`item_image`): Icono representativo.
-    - **Título** (`item_title`): Texto que indica que es "Información del usuario".
-    - **Descripción** (`item_description`): Muestra el nombre de usuario y contraseña del usuario autenticado.
-    - **Peso** (`item_weight`): Campo de texto que muestra el peso, que podría ser un campo personalizable.
-    - **Botones**:
-        - `edit_button`: Botón para editar la información del elemento (sin funcionalidad específica en este ejemplo).
-        - `delete_button`: Botón para eliminar el elemento (sin funcionalidad específica en este ejemplo).
-
-    #### **Código en Kotlin para `MyAdapter`:**
-
-    ```kotlin
-    package com.example.proyectoevaluable
-
-    import android.view.LayoutInflater
-    import android.view.View
-    import android.view.ViewGroup
-    import android.widget.TextView
-    import androidx.recyclerview.widget.RecyclerView
-
-    class MyAdapter(private val user: String, private val password: String) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_card, parent, false)
-            return MyViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-            holder.titleTextView.text = "Información del usuario"
-            holder.descriptionTextView.text = "Usuario: $user\nContraseña: $password"
-            holder.weightTextView.text = "Peso: --" // Este campo es opcional y personalizable
-        }
-
-        override fun getItemCount(): Int {
-            return 1 // Número de tarjetas mostradas, aquí se limita a un solo elemento
-        }
-
-        class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val titleTextView: TextView = itemView.findViewById(R.id.item_title)
-            val descriptionTextView: TextView = itemView.findViewById(R.id.item_description)
-            val weightTextView: TextView = itemView.findViewById(R.id.item_weight)
-        }
-    }
+1. Clona o descarga el repositorio.
+2. Abre el proyecto en **Android Studio** (versión compatible con Kotlin y las librerías de Material).
+3. Asegúrate de tener configuradas las dependencias en `build.gradle` (módulo `app`) y de contar con un archivo `google-services.json` (si tu proyecto usa Firebase).
+4. Conecta un dispositivo o usa un emulador con minSdkVersion >= 19 (o la que hayas definido).
+5. Compila y ejecuta.
 

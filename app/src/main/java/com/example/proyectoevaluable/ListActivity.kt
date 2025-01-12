@@ -4,10 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -23,14 +26,13 @@ class ListActivity : AppCompatActivity() {
     private var items: MutableList<Card> = mutableListOf()
     private lateinit var currentUserUid: String
 
-    // Declaramos el DrawerLayout y NavigationView
+    // DrawerLayout y NavigationView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
-        // O el nombre que le hayas dado a tu nuevo layout con el DrawerLayout
 
         // Obtener UID del usuario actual autenticado
         val firebaseUser = FirebaseAuth.getInstance().currentUser
@@ -59,10 +61,29 @@ class ListActivity : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_crud -> {
-                    // TODO: Abrir tu CRUD o hacer la acción que corresponda
+                    // 1) Muestra la capa semitransparente
+                    val overlay = findViewById<View>(R.id.viewOverlayDim)
+                    overlay.visibility = View.VISIBLE
+
+                    // 2) Haz visible el contenedor del fragment
+                    val container = findViewById<FrameLayout>(R.id.fragmentContainer)
+                    container.visibility = View.VISIBLE
+
+                    // 3) Reemplaza con tu UserFragment
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainer, UserFragment())
+                        .addToBackStack(null)
+                        .commit()
                 }
                 R.id.nav_lista -> {
-                    // TODO: Mostrar la lista genérica (en tu caso, ya estás en la ListActivity)
+                    // Cierra cualquier fragment
+                    supportFragmentManager.popBackStack(
+                        null,
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    )
+                    // Oculta ambos
+                    findViewById<FrameLayout>(R.id.fragmentContainer).visibility = View.GONE
+                    findViewById<View>(R.id.viewOverlayDim).visibility = View.GONE
                 }
                 R.id.nav_logout -> {
                     FirebaseAuth.getInstance().signOut()
@@ -84,11 +105,10 @@ class ListActivity : AppCompatActivity() {
             showAddCardDialog()
         }
 
-        // Botón de perfil (en tu bottom nav); lo usabas para logout,
-        // pero ya que también lo tienes en Drawer, podrías cambiarlo
+        // Botón de perfil en el bottom nav (lo usabas para logout)
         val profileButton = findViewById<ImageView>(R.id.nav_profile)
         profileButton.setOnClickListener {
-            FirebaseAuth.getInstance().signOut() // Cerrar sesión
+            FirebaseAuth.getInstance().signOut()
             val loginIntent = Intent(this@ListActivity, LoginActivity::class.java)
             startActivity(loginIntent)
             finish()

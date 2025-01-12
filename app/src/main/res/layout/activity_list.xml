@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- activity_list.xml -->
 <androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,13 +8,13 @@
     android:layout_height="match_parent"
     tools:context=".ListActivity">
 
-    <!-- Contenedor principal de la actividad -->
+    <!-- Contenedor principal -->
     <RelativeLayout
         android:id="@+id/content_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Top bar -->
+        <!-- Barra superior (Top Bar) -->
         <LinearLayout
             android:id="@+id/topBar"
             android:layout_width="match_parent"
@@ -38,24 +37,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
                 android:text="PescaPro"
                 android:textColor="#000000"
                 android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- RecyclerView -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_below="@id/topBar"
-            android:layout_above="@id/bottomNavigation"
-            android:padding="8dp"
-            tools:listitem="@layout/item_card" />
-
-        <!-- Bottom navigation (tus iconos inferiores) -->
+        <!-- Barra inferior (Bottom Navigation) -->
         <LinearLayout
             android:id="@+id/bottomNavigation"
             android:layout_width="match_parent"
@@ -78,7 +66,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="home"
+                android:contentDescription="Home"
                 android:src="@drawable/home_ic" />
 
             <ImageView
@@ -86,11 +74,42 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="info"
+                android:contentDescription="Info"
                 android:src="@drawable/info_ic" />
         </LinearLayout>
 
-        <!-- Botón flotante de añadir -->
+        <!-- RecyclerView para la lista -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@id/topBar"
+            android:layout_above="@+id/bottomNavigation"
+            android:padding="8dp"
+            tools:listitem="@layout/item_card" />
+
+        <!-- Vista semitransparente para oscurecer el fondo (por defecto GONE) -->
+        <View
+            android:id="@+id/viewOverlayDim"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@+id/topBar"
+            android:layout_above="@+id/bottomNavigation"
+            android:visibility="gone"
+            android:elevation="19dp"
+            android:background="#80000000" />
+
+        <!-- Contenedor para el UserFragment, también por defecto GONE -->
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@+id/topBar"
+            android:layout_above="@+id/bottomNavigation"
+            android:visibility="gone"
+            android:elevation="20dp" />
+
+        <!-- Floating Action Button -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/button_add"
             android:layout_width="wrap_content"
@@ -101,7 +120,7 @@
             android:layout_marginBottom="60dp"
             android:src="@android:drawable/ic_input_add"
             android:contentDescription="Agregar"
-            app:tint="@color/black"
+            app:tint="@color/white"
             android:backgroundTint="@color/color_button_default" />
 
     </RelativeLayout>
@@ -114,8 +133,8 @@
         android:layout_gravity="start"
         android:background="#00D8E6"
         android:elevation="4dp"
-        app:menu="@menu/drawer_menu"
         app:itemTextColor="@color/black"
-        app:itemIconTint="@color/black" />
+        app:itemIconTint="@color/black"
+        app:menu="@menu/drawer_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
