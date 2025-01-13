@@ -60,7 +60,7 @@ class ListActivity : AppCompatActivity() {
         // Configurar eventos del NavigationView
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_crud -> {
+                R.id.nav_profile -> {
                     // 1) Muestra la capa semitransparente
                     val overlay = findViewById<View>(R.id.viewOverlayDim)
                     overlay.visibility = View.VISIBLE
@@ -75,16 +75,28 @@ class ListActivity : AppCompatActivity() {
                         .addToBackStack(null)
                         .commit()
                 }
-                R.id.nav_lista -> {
+                R.id.nav_main_list -> {
                     // Cierra cualquier fragment
                     supportFragmentManager.popBackStack(
                         null,
                         FragmentManager.POP_BACK_STACK_INCLUSIVE
                     )
-                    // Oculta ambos
+                    // Oculta el contenedor y la capa de superposición
                     findViewById<FrameLayout>(R.id.fragmentContainer).visibility = View.GONE
                     findViewById<View>(R.id.viewOverlayDim).visibility = View.GONE
                 }
+                R.id.nav_second_list -> {
+                    val container = findViewById<FrameLayout>(R.id.fragmentContainer)
+                    container.visibility = View.VISIBLE
+
+                    // Reemplaza con el nuevo fragmento FishingTipsFragment
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainer, FishingTipsFragment())
+                        .addToBackStack(null) // Agrega a la pila de retroceso
+                        .commit()
+                }
+
+
                 R.id.nav_logout -> {
                     FirebaseAuth.getInstance().signOut()
                     startActivity(Intent(this, LoginActivity::class.java))
@@ -108,11 +120,48 @@ class ListActivity : AppCompatActivity() {
         // Botón de perfil en el bottom nav (lo usabas para logout)
         val profileButton = findViewById<ImageView>(R.id.nav_profile)
         profileButton.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            val loginIntent = Intent(this@ListActivity, LoginActivity::class.java)
-            startActivity(loginIntent)
-            finish()
+            // 1) Muestra la capa semitransparente
+            val overlay = findViewById<View>(R.id.viewOverlayDim)
+            overlay.visibility = View.VISIBLE
+
+            // 2) Haz visible el contenedor del fragment
+            val container = findViewById<FrameLayout>(R.id.fragmentContainer)
+            container.visibility = View.VISIBLE
+
+            // 3) Reemplaza con tu UserFragment
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, UserFragment())
+                .addToBackStack(null)
+                .commit()
         }
+
+        // Botón "Home" en la barra inferior
+        val navHome = findViewById<ImageView>(R.id.nav_home)
+        navHome.setOnClickListener {
+            // Cierra cualquier fragment
+            supportFragmentManager.popBackStack(
+                null,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+            // Oculta el contenedor y la capa de superposición
+            findViewById<FrameLayout>(R.id.fragmentContainer).visibility = View.GONE
+            findViewById<View>(R.id.viewOverlayDim).visibility = View.GONE
+        }
+
+        // Botón "Info" en la barra inferior
+        val navInfo = findViewById<ImageView>(R.id.nav_info)
+        navInfo.setOnClickListener {
+            val container = findViewById<FrameLayout>(R.id.fragmentContainer)
+            container.visibility = View.VISIBLE
+
+            // Reemplaza con el nuevo fragmento FishingTipsFragment
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, FishingTipsFragment())
+                .addToBackStack(null) // Agrega a la pila de retroceso
+                .commit()
+        }
+
+
     }
 
     private fun setUpRecyclerView() {

@@ -5,20 +5,25 @@
     <group android:id="@+id/nav_group" android:checkableBehavior="single">
         <!-- TOP LEVEL (los que quieras tener como principales) -->
         <item
-            android:id="@+id/nav_crud"
-            android:title="CRUD Personalizado"
-            android:icon="@drawable/ic_eye" />
+            android:id="@+id/nav_profile"
+            android:title="Mis Datos"
+            android:icon="@drawable/user_ic" />
 
         <item
-            android:id="@+id/nav_lista"
+            android:id="@+id/nav_main_list"
+            android:title="Lista Personal"
+            android:icon="@drawable/burguer_menu_ic" />
+
+        <item
+            android:id="@+id/nav_second_list"
             android:title="Lista Genérica"
             android:icon="@drawable/ic_list" />
-
-        <!-- Logout (en Drawer) -->
-        <item
-            android:id="@+id/nav_logout"
-            android:title="Logout"
-            android:icon="@drawable/logout_ic" />
-
     </group>
+
+    <!-- Logout (al final del Drawer) -->
+    <item
+        android:id="@+id/nav_logout"
+        android:title="Logout"
+        android:icon="@drawable/logout_ic"
+        android:layout_gravity="bottom" />
 </menu>

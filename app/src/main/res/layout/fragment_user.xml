@@ -9,6 +9,16 @@
     android:orientation="vertical"
     android:gravity="center">
 
+    <!-- Imagen centrada más arriba -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo"
+        android:layout_marginTop="48dp"
+        android:contentDescription="logo_description" />
+
+    <!-- Texto rodeado de borde con margen interno y externo -->
     <TextView
         android:id="@+id/textViewUserInfo"
         android:layout_width="wrap_content"
@@ -16,13 +26,17 @@
         android:text="Información de usuario"
         android:textSize="18sp"
         android:textColor="@android:color/black"
-        android:layout_marginBottom="16dp" />
+        android:layout_margin="32dp"
+        android:background="@drawable/dialog_card_border"
+        android:padding="24dp" />
 
+    <!-- Contenedor de botones movido más abajo -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="48dp">
 
         <!-- Botón "Cerrar" -->
         <com.google.android.material.button.MaterialButton
@@ -35,7 +49,8 @@
             android:textAllCaps="false"
             android:layout_marginRight="16dp"
             app:backgroundTint="@null"
-            android:background="@drawable/button_background_selector"/>
+            android:background="@drawable/button_background_selector" />
 
-        </LinearLayout>
+    </LinearLayout>
+
 </LinearLayout>

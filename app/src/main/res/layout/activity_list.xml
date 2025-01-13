@@ -135,6 +135,8 @@
         android:elevation="4dp"
         app:itemTextColor="@color/black"
         app:itemIconTint="@color/black"
-        app:menu="@menu/drawer_menu" />
+        app:menu="@menu/drawer_menu"
+        app:headerLayout="@layout/drawer_header" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
+
