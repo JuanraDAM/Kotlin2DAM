@@ -39,6 +39,19 @@ Esta aplicación está desarrollada en Android (Kotlin) y permite:
 6. **Card (data class)**
     - Modelo de datos con `username`, `password`, `weight`, `photoUri`.
 
+7. **FishingTipsFragment**
+   - Es un `Fragment` que muestra una lista de consejos sobre pesca.
+   - Utiliza un `RecyclerView` para presentar las tarjetas de consejos (`Card`) de forma estática.
+   - Cada tarjeta incluye un título, descripción y una imagen opcional.
+   - No permite editar ni eliminar tarjetas, ya que su propósito es solo mostrar información estática.
+   - Se integra en el contenedor de `ListActivity` al seleccionar el botón de "Info" o la opción correspondiente en el menú.
+
+8. **StaticTipsAdapter**
+   - Adaptador específico para el `RecyclerView` de `FishingTipsFragment`.
+   - Renderiza las tarjetas (`Card`) con un diseño simplificado (sin botones de edición ni eliminación).
+   - Soporta mostrar imágenes asociadas a cada consejo o un icono por defecto si no hay imagen disponible.
+   - Es una clase independiente para separar la lógica de las tarjetas estáticas de las tarjetas interactivas manejadas por `MyAdapter`.
+
 ## Dependencias principales
 
 - **Firebase Auth** (`com.google.firebase:firebase-auth`) para el sistema de login/registro.
