@@ -1,16 +1,16 @@
 package com.example.proyectoevaluable
 
+import android.app.AlertDialog
+import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
-import android.app.AlertDialog
-import android.content.Context
 import android.widget.ImageView
-import android.net.Uri
+import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 
 class MyAdapter(
     private val context: Context,
@@ -67,14 +67,10 @@ class MyAdapter(
 
         val dialog = AlertDialog.Builder(context).create()
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_image, null)
-
         val imageView = dialogView.findViewById<ImageView>(R.id.dialog_image_view)
         imageView.setImageURI(Uri.parse(photoUri))
-
         dialog.setView(dialogView)
-        dialog.setCanceledOnTouchOutside(true)  // Esto permite cerrar el diálogo al tocar fuera
-
-        // Ajustamos el tamaño del diálogo
+        dialog.setCanceledOnTouchOutside(true)  // Permite cerrar al tocar fuera
         dialog.window?.setLayout(
             (context.resources.displayMetrics.widthPixels * 0.7).toInt(),
             (context.resources.displayMetrics.heightPixels * 0.7).toInt()
@@ -82,10 +78,7 @@ class MyAdapter(
         dialog.show()
     }
 
-
-    override fun getItemCount(): Int {
-        return items.size
-    }
+    override fun getItemCount(): Int = items.size
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.item_image)

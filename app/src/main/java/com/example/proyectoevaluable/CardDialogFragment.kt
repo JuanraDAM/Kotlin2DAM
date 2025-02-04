@@ -3,7 +3,6 @@ package com.example.proyectoevaluable
 import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -42,17 +41,14 @@ class CardDialogFragment(
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(requireContext())
         val inflater = requireActivity().layoutInflater
-
-        // Inflar el layout personalizado
         val view = inflater.inflate(R.layout.dialog_card, null)
 
-        // Obtener las referencias a los elementos de vista
         val titleEditText: EditText = view.findViewById(R.id.titleEditText)
         val descriptionEditText: EditText = view.findViewById(R.id.descriptionEditText)
         val weightEditText: EditText = view.findViewById(R.id.weightEditText)
         val selectPhotoImageView: ImageView = view.findViewById(R.id.selectPhotoImageView)
 
-        // Inicializar los campos con datos iniciales
+        // Inicializar con datos previos si existen
         titleEditText.setText(initialTitle)
         descriptionEditText.setText(initialDescription)
         weightEditText.setText(initialWeight)
@@ -62,12 +58,10 @@ class CardDialogFragment(
             selectPhotoImageView.setImageURI(photoUri)
         }
 
-        // Configurar el listener para seleccionar foto
         selectPhotoImageView.setOnClickListener {
             showImagePickerOptions()
         }
 
-        // Aplicar el layout personalizado al diálogo
         builder.setView(view)
             .setTitle(if (initialTitle == null) "Añadir Tarjeta" else "Editar Tarjeta")
             .setPositiveButton("Guardar") { _, _ ->
@@ -80,15 +74,10 @@ class CardDialogFragment(
                 dialog.dismiss()
             }
 
-        // Crear el diálogo
         val dialog = builder.create()
-
-        // Aplicar estilos al fondo del diálogo
         dialog.window?.setBackgroundDrawableResource(R.drawable.dialog_card_border)
-
         return dialog
     }
-
 
     private fun showImagePickerOptions() {
         val options = arrayOf("Abrir cámara", "Seleccionar de la galería")
@@ -104,10 +93,8 @@ class CardDialogFragment(
     }
 
     private fun checkCameraPermissions() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
         ) {
             openCamera()
         } else {
@@ -154,11 +141,7 @@ class CardDialogFragment(
         startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == CAMERA_PERMISSION_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera()
@@ -187,7 +170,6 @@ class CardDialogFragment(
         val contentResolver = requireContext().contentResolver
         val fileName = "image_${System.currentTimeMillis()}.jpg"
         val file = File(requireContext().filesDir, fileName)
-
         try {
             contentResolver.openInputStream(imageUri)?.use { inputStream ->
                 file.outputStream().use { outputStream ->
@@ -197,7 +179,6 @@ class CardDialogFragment(
         } catch (e: IOException) {
             Toast.makeText(requireContext(), "Error al guardar imagen", Toast.LENGTH_SHORT).show()
         }
-
         return Uri.fromFile(file)
     }
 }

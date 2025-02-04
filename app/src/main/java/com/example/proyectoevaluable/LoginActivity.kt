@@ -12,10 +12,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint  // <-- Añade esta anotación
 class LoginActivity : AppCompatActivity() {
 
-    // Instancia de FirebaseAuth
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,39 +65,29 @@ class LoginActivity : AppCompatActivity() {
 
         // Configuración del TextView que se ve como un hipervínculo
         val recoverPasswordText: TextView = findViewById(R.id.recoverPasswordText)
-
-        // Aplica el subrayado al texto
         val content = SpannableString("Recuperar contraseña")
         content.setSpan(UnderlineSpan(), 0, content.length, 0)
         recoverPasswordText.text = content
 
-        // Configuración del OnClickListener
         recoverPasswordText.setOnClickListener {
-            // Lógica para la recuperación de la contraseña
-            val email = emailEditText.text.toString().trim() // Asegúrate de tener emailEditText correctamente definido
+            val email = emailEditText.text.toString().trim()
             recoverPassword(email)
         }
 
         // Inicialización del botón para mostrar/ocultar la contraseña
         val showPasswordButton = findViewById<ImageButton>(R.id.showPasswordButton)
-
         showPasswordButton.setOnClickListener {
-            // Alternar la visibilidad de la contraseña
-            if (passwordEditText.inputType == android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD) {
-                // Si está oculto, cambiar a texto normal (mostrar)
+            if (passwordEditText.inputType == (android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
                 passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT
-                showPasswordButton.setImageResource(R.drawable.ic_eye) // Cambiar ícono a "ojo abierto"
+                showPasswordButton.setImageResource(R.drawable.ic_eye) // ojo abierto
             } else {
-                // Si está visible, cambiar a contraseña (ocultar)
                 passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-                showPasswordButton.setImageResource(R.drawable.ic_eye) // Cambiar ícono a "ojo cerrado"
+                showPasswordButton.setImageResource(R.drawable.ic_eye) // ojo cerrado
             }
-            // Para que el cambio de visibilidad surta efecto
             passwordEditText.setSelection(passwordEditText.text.length)
         }
     }
 
-    // Validar email y contraseña
     private fun validateEmailPassword(email: String, password: String): Boolean {
         if (email.isEmpty()) {
             Toast.makeText(this, "Introduce un correo electrónico", Toast.LENGTH_SHORT).show()
@@ -113,7 +104,6 @@ class LoginActivity : AppCompatActivity() {
         return true
     }
 
-    // Iniciar sesión
     private fun loginUser(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -121,7 +111,6 @@ class LoginActivity : AppCompatActivity() {
                     val user = auth.currentUser
                     if (user != null && user.isEmailVerified) {
                         Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-                        // Ir a la siguiente actividad
                         val intent = Intent(this, ListActivity::class.java)
                         startActivity(intent)
                         finish()
@@ -134,7 +123,6 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    // Registrar un nuevo usuario
     private fun registerUser(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -151,7 +139,6 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    // Recuperación de contraseña
     private fun recoverPassword(email: String) {
         if (email.isEmpty()) {
             Toast.makeText(this, "Introduce un correo electrónico", Toast.LENGTH_SHORT).show()

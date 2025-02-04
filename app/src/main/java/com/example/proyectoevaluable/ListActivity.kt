@@ -1,47 +1,49 @@
 package com.example.proyectoevaluable
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ListActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private var adapter: MyAdapter? = null
-    private var items: MutableList<Card> = mutableListOf()
-    private lateinit var currentUserUid: String
 
     // DrawerLayout y NavigationView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
 
+    private val viewModel: ListViewModel by viewModels()
+
+    @Inject
+    lateinit var cardRepository: CardRepository
+
+    private val items = mutableListOf<Card>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-        // Obtener UID del usuario actual autenticado
+        // Verificar si hay un usuario autenticado
         val firebaseUser = FirebaseAuth.getInstance().currentUser
-        if (firebaseUser != null) {
-            currentUserUid = firebaseUser.uid
-        } else {
-            // Si no hay un usuario autenticado, redirigir a la pantalla de inicio de sesión
-            val loginIntent = Intent(this, LoginActivity::class.java)
-            startActivity(loginIntent)
+        if (firebaseUser == null) {
+            startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
         }
@@ -54,56 +56,38 @@ class ListActivity : AppCompatActivity() {
         val addButton = findViewById<FloatingActionButton>(R.id.button_add)
 
         // Configurar RecyclerView con adaptador
-        items = loadCardsData().toMutableList()
         setUpRecyclerView()
 
         // Configurar eventos del NavigationView
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile -> {
-                    // 1) Muestra la capa semitransparente
-                    val overlay = findViewById<View>(R.id.viewOverlayDim)
-                    overlay.visibility = View.VISIBLE
-
-                    // 2) Haz visible el contenedor del fragment
-                    val container = findViewById<FrameLayout>(R.id.fragmentContainer)
-                    container.visibility = View.VISIBLE
-
-                    // 3) Reemplaza con tu UserFragment
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainer, UserFragment())
-                        .addToBackStack(null)
-                        .commit()
+                    // Mostramos el fragment de perfil (UserFragment)
+                    showUserFragment()
                 }
                 R.id.nav_main_list -> {
-                    // Cierra cualquier fragment
+                    // Si es la lista principal, cerramos cualquier fragment
                     supportFragmentManager.popBackStack(
                         null,
                         FragmentManager.POP_BACK_STACK_INCLUSIVE
                     )
-                    // Oculta el contenedor y la capa de superposición
-                    findViewById<FrameLayout>(R.id.fragmentContainer).visibility = View.GONE
-                    findViewById<View>(R.id.viewOverlayDim).visibility = View.GONE
                 }
                 R.id.nav_second_list -> {
                     val container = findViewById<FrameLayout>(R.id.fragmentContainer)
                     container.visibility = View.VISIBLE
-
-                    // Reemplaza con el nuevo fragmento FishingTipsFragment
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainer, FishingTipsFragment())
-                        .addToBackStack(null) // Agrega a la pila de retroceso
+                        .addToBackStack(null)
                         .commit()
                 }
-
-
                 R.id.nav_logout -> {
+                    // Lógica para cerrar sesión
                     FirebaseAuth.getInstance().signOut()
                     startActivity(Intent(this, LoginActivity::class.java))
                     finish()
                 }
             }
-            drawerLayout.closeDrawer(GravityCompat.START) // Cierra el menú
+            drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
 
@@ -117,59 +101,54 @@ class ListActivity : AppCompatActivity() {
             showAddCardDialog()
         }
 
-        // Botón de perfil en el bottom nav (lo usabas para logout)
-        val profileButton = findViewById<ImageView>(R.id.nav_profile)
-        profileButton.setOnClickListener {
-            // 1) Muestra la capa semitransparente
-            val overlay = findViewById<View>(R.id.viewOverlayDim)
-            overlay.visibility = View.VISIBLE
-
-            // 2) Haz visible el contenedor del fragment
-            val container = findViewById<FrameLayout>(R.id.fragmentContainer)
-            container.visibility = View.VISIBLE
-
-            // 3) Reemplaza con tu UserFragment
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, UserFragment())
-                .addToBackStack(null)
-                .commit()
+        // Botones de la navegación inferior
+        // Se ha renombrado el id para evitar conflictos: de nav_profile a bottom_nav_profile
+        val bottomProfileButton = findViewById<ImageView>(R.id.nav_profile)
+        bottomProfileButton.setOnClickListener {
+            showUserFragment()
         }
 
-        // Botón "Home" en la barra inferior
         val navHome = findViewById<ImageView>(R.id.nav_home)
         navHome.setOnClickListener {
-            // Cierra cualquier fragment
             supportFragmentManager.popBackStack(
                 null,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE
             )
-            // Oculta el contenedor y la capa de superposición
             findViewById<FrameLayout>(R.id.fragmentContainer).visibility = View.GONE
             findViewById<View>(R.id.viewOverlayDim).visibility = View.GONE
         }
 
-        // Botón "Info" en la barra inferior
         val navInfo = findViewById<ImageView>(R.id.nav_info)
         navInfo.setOnClickListener {
             val container = findViewById<FrameLayout>(R.id.fragmentContainer)
             container.visibility = View.VISIBLE
-
-            // Reemplaza con el nuevo fragmento FishingTipsFragment
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, FishingTipsFragment())
-                .addToBackStack(null) // Agrega a la pila de retroceso
+                .addToBackStack(null)
                 .commit()
         }
 
+        // Observar los cambios en la lista de tarjetas
+        viewModel.cards.observe(this, Observer { cards ->
+            items.clear()
+            items.addAll(cards)
+            adapter?.notifyDataSetChanged()
+        })
 
+        // Cargar las tarjetas
+        viewModel.loadCards()
     }
 
     private fun setUpRecyclerView() {
         adapter = MyAdapter(
             this,
             items,
-            { position -> deleteCard(position) },
-            { position -> showEditCardDialog(position) }
+            onDeleteConfirmed = { position ->
+                viewModel.deleteCard(position)
+            },
+            onEditClicked = { position ->
+                showEditCardDialog(position)
+            }
         )
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
@@ -183,10 +162,9 @@ class ListActivity : AppCompatActivity() {
                 weight = weight,
                 photoUri = photoUri?.toString()
             )
-            items.add(card)
-            saveCardsData(items)
-            adapter?.notifyItemInserted(items.size - 1)
-            recyclerView.scrollToPosition(items.size - 1)
+            // Agregamos la tarjeta a la lista y actualizamos mediante el ViewModel
+            val newList = items.toMutableList().apply { add(card) }
+            viewModel.saveCards(newList)
         }
         dialog.show(supportFragmentManager, "AddCardDialog")
     }
@@ -199,43 +177,27 @@ class ListActivity : AppCompatActivity() {
             initialWeight = card.weight,
             initialPhotoUri = card.photoUri
         ) { title, description, weight, photoUri ->
+            // Actualizamos la tarjeta
             card.username = title
             card.password = description
             card.weight = weight
             card.photoUri = photoUri?.toString()
-            saveCardsData(items)
+            // Notificamos el cambio al adapter y guardamos una nueva instancia de la lista
             adapter?.notifyItemChanged(position)
+            viewModel.saveCards(items.toMutableList())
         }
         dialog.show(supportFragmentManager, "EditCardDialog")
     }
 
-    private fun deleteCard(position: Int) {
-        if (position >= 0 && position < items.size) {
-            items.removeAt(position)
-            saveCardsData(items)
-            adapter?.notifyItemRemoved(position)
-            adapter?.notifyItemRangeChanged(position, items.size)
-        }
-    }
-
-    private fun saveCardsData(cardsList: List<Card>) {
-        val sharedPreferences: SharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        val gson = Gson()
-        val json = gson.toJson(cardsList)
-        editor.putString("cards_data_$currentUserUid", json)
-        editor.apply()
-    }
-
-    private fun loadCardsData(): List<Card> {
-        val sharedPreferences: SharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val gson = Gson()
-        val json = sharedPreferences.getString("cards_data_$currentUserUid", null)
-        val type = object : TypeToken<List<Card>>() {}.type
-        return if (json != null) {
-            gson.fromJson(json, type)
-        } else {
-            emptyList()
-        }
+    private fun showUserFragment() {
+        // Muestra el fragment de perfil (UserFragment) en el contenedor correspondiente
+        val overlay = findViewById<View>(R.id.viewOverlayDim)
+        overlay.visibility = View.VISIBLE
+        val container = findViewById<FrameLayout>(R.id.fragmentContainer)
+        container.visibility = View.VISIBLE
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, UserFragment())
+            .addToBackStack(null)
+            .commit()
     }
 }

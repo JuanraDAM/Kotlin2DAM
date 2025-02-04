@@ -1,8 +1,9 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    // Agrega el complemento de Google Services
+    id("org.jetbrains.kotlin.kapt")
     id("com.google.gms.google-services")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -30,30 +31,36 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
+
 }
 
 dependencies {
-    // Firebase BoM (gestiona automáticamente las versiones de los SDK de Firebase)
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-
-    // Firebase Authentication (añadir el producto deseado)
     implementation("com.google.firebase:firebase-auth")
-
-    // Firebase Analytics (opcional, pero recomendable)
     implementation("com.google.firebase:firebase-analytics")
-
-    // Otras dependencias que ya tengas
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1")
     implementation("com.google.code.gson:gson:2.10.1")
+
+    // Hilt - Actualizado a la versión más reciente
+    implementation("com.google.dagger:hilt-android:2.50")
+    kapt("com.google.dagger:hilt-android-compiler:2.50")
+
+    // Eliminadas dependencias obsoletas de Hilt
+    implementation("androidx.activity:activity-ktx:1.7.2")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
