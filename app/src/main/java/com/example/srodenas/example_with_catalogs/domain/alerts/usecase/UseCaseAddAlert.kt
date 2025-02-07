@@ -6,11 +6,8 @@ import com.example.srodenas.example_with_catalogs.domain.alerts.models.Repositor
 
 class UseCaseAddAlert(val repo: RepositoryAlerts) {
     suspend fun add(alert: Alert): Int {
-        // Inserta la alerta y obtiene el id generado (Long)
         val newId = repo.addAlertForRepository(alert)
-        // Actualiza el objeto de dominio con el id generado
         alert.id = newId.toInt()
-        // Añade la alerta a la lista global (caché)
         ListAlerts.list.alerts.add(alert)
         return ListAlerts.list.alerts.lastIndex
     }

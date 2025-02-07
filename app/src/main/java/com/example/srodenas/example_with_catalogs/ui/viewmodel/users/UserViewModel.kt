@@ -28,15 +28,9 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     var posNewUserlLiveData = MutableLiveData<Int>()
     var posDeleteHotelLiveDate = MutableLiveData<Int>()
 
-    // Utilizamos el contexto de aplicación proporcionado por AndroidViewModel.
     private val appContext: Context = application.applicationContext
 
-    /**
-     * (Método de conveniencia) Inicializa el Profile si se detecta que hay datos de usuario
-     * en SharedPreferences. Al usar AndroidViewModel, ya disponemos de un contexto seguro.
-     */
     fun initContext(_context: Context) {
-        // Aunque se pasa _context, usamos appContext para garantizar la validez.
         val isLoggedInPreferences = isUserLoggedInShared()
         if (isLoggedInPreferences) {
             getUser()?.let { user ->
@@ -108,7 +102,6 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         val email = sharedPreferences.getString(appContext.getString(R.string.pref_user_email), null)
         if (name == null || email == null) return null
 
-        // Retornamos el usuario; los demás campos quedan vacíos si no se han guardado.
         return User(id, name, email, "", "", "")
     }
 
@@ -155,7 +148,6 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             val result = userRepository.eliminarUsuarioPorId(user.id)
             if (result) {
                 withContext(Dispatchers.Main) {
-                    // Actualizamos la lista de usuarios tras la eliminación.
                     showUsers()
                 }
             }
@@ -171,14 +163,11 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             val result = userRepository.actualizarNombre(id, newName)
             withContext(Dispatchers.Main) {
                 if (result) {
-                    // Si el usuario actualizado es el logueado, actualizamos también las SharedPreferences y el Profile.
                     val user = getUser()
                     if (user != null && user.id == id) {
                         saveUserPreferences(id, newName, user.email)
-                        // Re-inicializamos el Profile con el usuario modificado.
                         Profile.profile.initialize(User(id, newName, user.email, "", "", ""))
                     }
-                    // Refrescamos el listado de usuarios.
                     showUsers()
                 }
             }

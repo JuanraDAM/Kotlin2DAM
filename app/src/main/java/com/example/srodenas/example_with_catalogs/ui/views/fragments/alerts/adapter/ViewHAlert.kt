@@ -19,9 +19,6 @@ class ViewHAlert (view: View,
 
 
     fun renderize(alert: Alert, position:Int){
-        /*
-        Debemos de setear los campos
-         */
         binding.btnDeleteAlert.setOnClickListener{
             onDelete(position)
         }

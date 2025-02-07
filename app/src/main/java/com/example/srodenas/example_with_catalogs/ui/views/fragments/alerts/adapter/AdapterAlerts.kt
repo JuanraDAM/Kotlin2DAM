@@ -16,13 +16,10 @@ class AdapterAlerts(
         fun bind(alert: Alert, position: Int) {
             binding.txtNameAlert.text = alert.textShort
 
-            // Al pulsar la CardView completa (opcional) mostramos detalles.
             binding.root.setOnClickListener { detailsAction(position) }
 
-            // Botón para ver detalles
             binding.btnDetailsAlert.setOnClickListener { detailsAction(position) }
 
-            // Botón para eliminar la alerta
             binding.btnDeleteAlert.setOnClickListener { deleteAction(position) }
         }
     }

@@ -33,10 +33,9 @@ class AlertsViewModel : ViewModel() {
 
     fun addAlerts(newAlert: Alert) {
         viewModelScope.launch(Dispatchers.IO) {
-            val pos = useCaseAddAlert.add(newAlert)  // Se añade en la BBDD y en la caché global
+            val pos = useCaseAddAlert.add(newAlert)
             withContext(Dispatchers.Main) {
-                posNewAlertLiveDate.value = pos  // Notifica la posición de la alerta nueva
-                // Actualiza el LiveData con la lista actualizada de alertas
+                posNewAlertLiveDate.value = pos
                 listAlertsLiveData.value = ListAlerts.list.alerts
             }
         }
@@ -44,18 +43,13 @@ class AlertsViewModel : ViewModel() {
 
     fun delAlert(pos: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            // Verifica que la posición es válida
             if (pos in ListAlerts.list.alerts.indices) {
                 val alertToDelete = ListAlerts.list.alerts[pos]
                 RepositoryAlerts.repo.deleteAlertForRepository(alertToDelete)
-                // Elimina la alerta de la lista en caché
                 ListAlerts.list.alerts.removeAt(pos)
 
-                // Notifica el cambio en la UI (en el hilo principal)
                 withContext(Dispatchers.Main) {
-                    // Notifica que se eliminó el item
                     posDeleteAlertLiveData.value = pos
-                    // (Opcional) Actualiza la lista completa:
                     listAlertsLiveData.value = ListAlerts.list.alerts
                 }
             }
@@ -65,6 +59,6 @@ class AlertsViewModel : ViewModel() {
 
 
 
-    // Devuelve la alerta en la posición indicada
+
     fun getAlertForPosition(pos: Int): Alert = useCaseForPosition.devAlert(pos)
 }

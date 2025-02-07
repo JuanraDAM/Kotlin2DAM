@@ -9,6 +9,6 @@ class ProfileViewModel : ViewModel() {
     private val _text = MutableLiveData<String>().apply {
         value = "Perfil del usuario registrado"
     }
-    val text : LiveData<String> = _text  //recordamos que LiveData es una clase Abstracta.
+    val text : LiveData<String> = _text
 
 }

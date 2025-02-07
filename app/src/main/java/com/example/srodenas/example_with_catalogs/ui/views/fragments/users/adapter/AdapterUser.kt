@@ -19,11 +19,9 @@ class UserAdapter(
             binding.txtviewEmail.text = user.email
             binding.txtviewPhone.text = user.phone
 
-            // Al pulsar el botón de eliminar se invoca el callback correspondiente
             binding.btnDelete.setOnClickListener {
                 onDeleteClick(user)
             }
-            // Al pulsar el botón de editar se invoca el callback para editar
             binding.btnEdit.setOnClickListener {
                 onEditClick(user)
             }

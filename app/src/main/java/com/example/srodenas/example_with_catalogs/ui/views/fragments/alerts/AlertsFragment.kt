@@ -23,7 +23,6 @@ class AlertsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Inicializamos el adaptador con una lista vacía
         adapterAlerts = AdapterAlerts(
             mutableListOf(),
             deleteAction = { pos -> deleteAlertForDialog(pos) },
@@ -31,14 +30,11 @@ class AlertsFragment : Fragment() {
         )
     }
 
-    // Método para gestionar el borrado (se implementará según tus necesidades)
     private fun deleteAlertForDialog(pos: Int) {
-        // Llamamos directamente a la función del ViewModel para eliminar la alerta en la posición indicada
         viewModelAlerts.delAlert(pos)
     }
 
 
-    // Método para navegar a los detalles de la alerta seleccionada
     private fun detailsAlert(pos: Int) {
         val navController = findNavController()
         navController.navigate(AlertsFragmentDirections.actionAlertsFragmentToDetailsAlertFragment(num = pos))
@@ -51,20 +47,17 @@ class AlertsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Configuramos el RecyclerView
         binding?.myRecyclerViewAlerts?.layoutManager = LinearLayoutManager(activity)
         layoutManager = binding?.myRecyclerViewAlerts?.layoutManager as LinearLayoutManager
         binding?.myRecyclerViewAlerts?.adapter = adapterAlerts
         Log.d("AlertsFragment", "Adapter asignado: ${binding?.myRecyclerViewAlerts?.adapter}")
 
-        // Configuramos el clic del botón para añadir alerta
         binding?.btnAdd?.setOnClickListener {
             addAlert()
         }
         setObserverChangeViewModel()
     }
 
-    // Método que crea y añade una alerta nueva
     private fun addAlert() {
         Log.d("AlertsFragment", "Botón btnAdd pulsado")
         val newAlert = Alert(
@@ -77,7 +70,6 @@ class AlertsFragment : Fragment() {
         viewModelAlerts.addAlerts(newAlert)
     }
 
-    // Observa los cambios en el ViewModel para actualizar el adaptador
     private fun setObserverChangeViewModel() {
         viewModelAlerts.listAlertsLiveData.observe(viewLifecycleOwner) { listAlert ->
             adapterAlerts.updateData(listAlert)

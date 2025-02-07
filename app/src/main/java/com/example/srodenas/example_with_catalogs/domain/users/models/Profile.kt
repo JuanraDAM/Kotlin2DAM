@@ -2,7 +2,6 @@ package com.example.srodenas.example_with_catalogs.domain.users.models
 
 class Profile private constructor() {
 
-    // Ahora user es nullable para poder “limpiar” el perfil al logout.
     var user: User? = null
         private set
 

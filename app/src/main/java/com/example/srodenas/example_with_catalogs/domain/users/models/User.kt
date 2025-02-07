@@ -7,12 +7,11 @@ data class User(
     var id: Int,
     val name: String,
     val email: String,
-    val password: String,  // Consistente con UserEntity
+    val password: String,
     val phone: String,
-    val imag: String       // Consistente con UserEntity
+    val imag: String
 ){
 
-    //constructor primario
     constructor(email: String, passw: String):
             this(0, "", email, passw, "", "")
 

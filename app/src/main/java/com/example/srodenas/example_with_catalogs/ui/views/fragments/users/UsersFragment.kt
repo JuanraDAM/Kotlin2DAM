@@ -20,7 +20,6 @@ class UsersFragment : Fragment() {
     private var _binding: FragmentUsersBinding? = null
     private val binding get() = _binding!!
 
-    // Compartimos el UserViewModel con la Activity
     private val userViewModel: UserViewModel by viewModels({ requireActivity() })
 
     private lateinit var userAdapter: UserAdapter
@@ -71,7 +70,6 @@ class UsersFragment : Fragment() {
         builder.setPositiveButton("Guardar") { dialog, _ ->
             val newName = input.text.toString().trim()
             if (newName.isNotEmpty()) {
-                // Llama al método del ViewModel para actualizar el nombre del usuario.
                 userViewModel.updateUserName(user.id, newName)
             }
         }

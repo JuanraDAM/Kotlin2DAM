@@ -18,7 +18,6 @@ class DetailsAlertFragment : Fragment() {
     private var _binding: FragmentDetailsAlertBinding? = null
     private val binding get() = _binding!!
 
-    // Supongamos que recibes el argumento 'num' (la posición de la alerta en la lista)
     private val args: DetailsAlertFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -32,16 +31,13 @@ class DetailsAlertFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Supón que obtienes la alerta a partir de la posición usando el ViewModel o una clase de caché
         val pos = args.num
-        val alert = /* Obtén la alerta, por ejemplo: */ ListAlerts.list.alerts.get(pos)
+        val alert = ListAlerts.list.alerts.get(pos)
 
-        // Asignar los valores a la UI
         binding.txtAlertTitle.text = alert.textShort
         binding.txtAlertMessage.text = alert.message
         binding.txtAlertDate.text = "Fecha: ${alert.alertDate}" // Puedes formatear la fecha adecuadamente
 
-        // Botón para cerrar el fragmento y volver
         binding.btnCloseDetails.setOnClickListener {
             findNavController().navigateUp()
         }

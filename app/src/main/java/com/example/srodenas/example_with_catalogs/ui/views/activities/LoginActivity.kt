@@ -16,26 +16,22 @@ import com.example.srodenas.example_with_catalogs.ui.views.fragments.users.dialo
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    val userViewModel: UserViewModel by viewModels()  // ViewModel del usuario.
+    val userViewModel: UserViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Inicializa el contexto del ViewModel primero.
         userViewModel.initContext(this)
 
-        // Comprobamos si ya hay un usuario logueado.
         if (isUserLoggedIn()) {
-            // Ahora getUser() puede funcionar correctamente porque el contexto ya está inicializado.
             val user = userViewModel.getUser()
             if (user != null) {
                 Profile.profile.initialize(user)
             }
             startMainActivity()
-            return  // Salimos de onCreate para que no se muestre la pantalla de login.
+            return
         }
 
-        // Si no hay usuario logueado, se continúa con la pantalla de login.
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         registerLiveData()
@@ -61,7 +57,6 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun startMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
-        // Limpiar la pila para evitar volver a la LoginActivity al pulsar Back.
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
@@ -93,8 +88,6 @@ class LoginActivity : AppCompatActivity() {
                     Profile.profile.initialize(user)
                     startMainActivity()
                 } ?: run {
-                    // En caso de que getUser() retorne null (lo cual no debería suceder si isLoggin es true),
-                    // se puede mostrar un mensaje de error o forzar un logout.
                     Toast.makeText(this, "Error: usuario no encontrado", Toast.LENGTH_LONG).show()
                 }
             } else {

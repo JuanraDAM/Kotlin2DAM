@@ -13,10 +13,8 @@ class RepositoryAlerts private constructor(private val alertDao: AlertDao) {
         }
     }
 
-    // Inserta la alerta usando la entidad y devuelve el id generado
     suspend fun addAlertForRepository(newAlert: Alert): Long {
         val idUser = Profile.profile.user!!.id
-        // Construimos la entidad con id = 0 para que Room la genere
         val alertEntity = AlertEntity(
             id = 0,
             userId = idUser,
@@ -43,7 +41,6 @@ class RepositoryAlerts private constructor(private val alertDao: AlertDao) {
 
     suspend fun showAlertById(id: Int): Alert = (alertDao.getAlertById(id))!!.toEntity()
 
-    // Conversión de AlertEntity a Alert (modelo de dominio)
     fun AlertEntity.toEntity(): Alert {
         return Alert(
             id = this.id,

@@ -22,7 +22,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    // Declaramos el ViewModel usando 'by viewModels()'
     private val userViewModel: UserViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,16 +29,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Se utiliza un bloque de coroutine para leer el usuario en un hilo IO
         lifecycleScope.launch(Dispatchers.IO) {
             val loggedUser = userViewModel.getUser()
             withContext(Dispatchers.Main) {
                 if (loggedUser != null) {
-                    // Se inicializa el Profile con el usuario recuperado
                     Profile.profile.initialize(loggedUser)
                     Log.d("MainActivity", "Profile inicializado con: ${loggedUser.name}")
                 } else {
-                    // Si no hay usuario guardado, redirigimos a LoginActivity
                     Log.e("MainActivity", "No se pudo inicializar el Profile. Redirige al login.")
                     startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                     finish()
@@ -48,7 +44,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Configuración del BottomNavigationView y navegación
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         val appBarConfiguration = AppBarConfiguration(
             setOf(R.id.alertsFragment, R.id.usersFragment, R.id.profileFragment)

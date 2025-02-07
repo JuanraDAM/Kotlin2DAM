@@ -16,7 +16,6 @@ class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    // Se comparte el ViewModel con la Activity (si es necesario)
     private val userViewModel: UserViewModel by viewModels({ requireActivity() })
 
     override fun onCreateView(
@@ -29,17 +28,13 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Muestra los datos del usuario, si está inicializado
         Profile.profile.user?.let { user ->
             binding.txtUserName.text = user.name
             binding.txtUserEmail.text = user.email
         }
-        // Configura el botón de logout
         binding.btnLogout.setOnClickListener {
-            // Realiza el logout
             userViewModel.logout(this.requireContext())
 
-            // Lanza la LoginActivity con las banderas para limpiar la pila
             val intent = Intent(requireContext(), LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
