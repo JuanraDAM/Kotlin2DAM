@@ -1,6 +1,5 @@
 package com.example.srodenas.example_with_catalogs.ui.viewmodel.alerts
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,53 +14,57 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AlertsViewModel : ViewModel() {
-    var posNewAlertLiveDate = MutableLiveData<Int> () //Notifico un cambio al añadir una alerta
-    var posDeleteAlertLiveData = MutableLiveData<Int> () //Notifico un cambio al eliminar una alerta
-    var listAlertsLiveData = MutableLiveData<List<Alert>>()  //Será mi lista de alertas.
+    var posNewAlertLiveDate = MutableLiveData<Int>() // Notifica la posición del ítem insertado
+    var posDeleteAlertLiveData = MutableLiveData<Int>() // Notifica la posición del ítem borrado
+    var listAlertsLiveData = MutableLiveData<List<Alert>>()  // Lista completa de alertas para la UI
 
     private val useCaseShowAlerts = UseCaseShowAlerts(RepositoryAlerts.repo)
     private val useCaseAddAlert = UseCaseAddAlert(RepositoryAlerts.repo)
     private val useCaseForPosition = UseCaseForPosition(RepositoryAlerts.repo)
-    /*private val _text = MutableLiveData<String>().apply {
-        value = "Alertas"
-    }
-    val text : LiveData<String> = _text  //recordamos que LiveData es una clase Abstracta.
 
-*/
-
-
-    fun showAlerts(){
-        //Queremos obtener las alertas.
+    fun showAlerts() {
         viewModelScope.launch(Dispatchers.IO) {
-            ListAlerts.list.alerts = useCaseShowAlerts.showAlerts() //Cargo los datos en cache
-            ListAlerts.list.alerts.let {
+            ListAlerts.list.alerts = useCaseShowAlerts.showAlerts() // Carga las alertas desde la BBDD
+            withContext(Dispatchers.Main) {
+                listAlertsLiveData.value = ListAlerts.list.alerts
+            }
+        }
+    }
+
+    fun addAlerts(newAlert: Alert) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val pos = useCaseAddAlert.add(newAlert)  // Se añade en la BBDD y en la caché global
+            withContext(Dispatchers.Main) {
+                posNewAlertLiveDate.value = pos  // Notifica la posición de la alerta nueva
+                // Actualiza el LiveData con la lista actualizada de alertas
+                listAlertsLiveData.value = ListAlerts.list.alerts
+            }
+        }
+    }
+
+    fun delAlert(pos: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // Verifica que la posición es válida
+            if (pos in ListAlerts.list.alerts.indices) {
+                val alertToDelete = ListAlerts.list.alerts[pos]
+                RepositoryAlerts.repo.deleteAlertForRepository(alertToDelete)
+                // Elimina la alerta de la lista en caché
+                ListAlerts.list.alerts.removeAt(pos)
+
+                // Notifica el cambio en la UI (en el hilo principal)
                 withContext(Dispatchers.Main) {
-                    listAlertsLiveData.value = it
+                    // Notifica que se eliminó el item
+                    posDeleteAlertLiveData.value = pos
+                    // (Opcional) Actualiza la lista completa:
+                    listAlertsLiveData.value = ListAlerts.list.alerts
                 }
             }
         }
     }
 
 
-    fun addAlerts(newAlert: Alert){
-        viewModelScope.launch(Dispatchers.IO) {
-            val pos = useCaseAddAlert.add(newAlert)  //He añadido en la BBDD y en cache
-            withContext(Dispatchers.Main) {
-                posNewAlertLiveDate.value = pos  //notificamos de la posición de la nueva alerta.
-              //  listAlertsLiveData.value = ListAlerts.list.alerts
-            }
-        }
-
-    }
 
 
-    fun delAlert(pos: Int){
-
-    }
-
-
-
-    //Devuelve la alerta en posición de la lista en memoria.
-    fun getAlertForPosition(pos: Int) : Alert = useCaseForPosition.devAlert(pos)
-
+    // Devuelve la alerta en la posición indicada
+    fun getAlertForPosition(pos: Int): Alert = useCaseForPosition.devAlert(pos)
 }

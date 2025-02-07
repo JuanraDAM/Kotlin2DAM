@@ -4,17 +4,14 @@ import com.example.srodenas.example_with_catalogs.domain.alerts.models.Alert
 import com.example.srodenas.example_with_catalogs.domain.alerts.models.ListAlerts
 import com.example.srodenas.example_with_catalogs.domain.alerts.models.RepositoryAlerts
 
-/*
-Caso de Uso añadir una alerta. Pasamos el repositorio.
- */
-class UseCaseAddAlert(val repo : RepositoryAlerts) {
-
-    suspend fun add(alert: Alert):Int{
-        repo.addAlertForRepository(alert)
-        ListAlerts.list.alerts.add(alert)//También actualizo en cache.
-        return ListAlerts.list.alerts.lastIndex  //devuelvo la última posición insertada.
-
+class UseCaseAddAlert(val repo: RepositoryAlerts) {
+    suspend fun add(alert: Alert): Int {
+        // Inserta la alerta y obtiene el id generado (Long)
+        val newId = repo.addAlertForRepository(alert)
+        // Actualiza el objeto de dominio con el id generado
+        alert.id = newId.toInt()
+        // Añade la alerta a la lista global (caché)
+        ListAlerts.list.alerts.add(alert)
+        return ListAlerts.list.alerts.lastIndex
     }
-
-
 }

@@ -6,43 +6,49 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.srodenas.example_with_catalogs.databinding.FragmentAlertsBinding
+import com.example.srodenas.example_with_catalogs.databinding.FragmentDetailsAlertBinding
+import com.example.srodenas.example_with_catalogs.domain.alerts.models.ListAlerts
 import com.example.srodenas.example_with_catalogs.ui.viewmodel.alerts.DetailsAlertViewModel
 
-
 class DetailsAlertFragment : Fragment() {
-    lateinit var binding : FragmentAlertsBinding
-    val myArgument : DetailsAlertFragmentArgs by navArgs()
-    private val viewModelAlertDetails : DetailsAlertViewModel by viewModels()
 
+    private var _binding: FragmentDetailsAlertBinding? = null
+    private val binding get() = _binding!!
+
+    // Supongamos que recibes el argumento 'num' (la posición de la alerta en la lista)
+    private val args: DetailsAlertFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        binding = FragmentAlertsBinding.inflate(inflater, container, false)
+        _binding = FragmentDetailsAlertBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().let{
-            val posAlertDetail = myArgument.num //Ya tengo el argumento pasado desde el otro fragmento
-            /*
-            1.- Sólo tengo que recuperar dicho objeto desde el viewmodel. Invoco al método oportuno
-            2.- Observo cambios en el modelo
-            3.- Muestro los detalles en la view.
+        // Supón que obtienes la alerta a partir de la posición usando el ViewModel o una clase de caché
+        val pos = args.num
+        val alert = /* Obtén la alerta, por ejemplo: */ ListAlerts.list.alerts.get(pos)
 
-             */
+        // Asignar los valores a la UI
+        binding.txtAlertTitle.text = alert.textShort
+        binding.txtAlertMessage.text = alert.message
+        binding.txtAlertDate.text = "Fecha: ${alert.alertDate}" // Puedes formatear la fecha adecuadamente
 
-            viewModelAlertDetails.alertLiveData.observe(viewLifecycleOwner, {
-                alert -> //TODO YA TENGO LA ALERTA Y TENGO QUE MOSTRARLA EN LA UI
-            })
-
+        // Botón para cerrar el fragmento y volver
+        binding.btnCloseDetails.setOnClickListener {
+            findNavController().navigateUp()
         }
-
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

@@ -5,7 +5,7 @@ import com.example.srodenas.example_with_catalogs.domain.alerts.models.Repositor
 import com.example.srodenas.example_with_catalogs.domain.users.models.Profile
 
 class UseCaseShowAlerts (val repositoryAlerts: RepositoryAlerts) {
-    suspend fun showAlerts() = repositoryAlerts.showAllAlerts(Profile.profile.user.id).toMutableList()
+    suspend fun showAlerts() = repositoryAlerts.showAllAlerts(Profile.profile.user!!.id).toMutableList()
 
 
 }

@@ -3,33 +3,44 @@ package com.example.srodenas.example_with_catalogs.ui.views.fragments.alerts.ada
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.srodenas.example_with_catalogs.R
+import com.example.srodenas.example_with_catalogs.databinding.ItemAlertBinding
 import com.example.srodenas.example_with_catalogs.domain.alerts.models.Alert
 
-class AdapterAlerts   (
-    var listAlerts : MutableList<Alert>,
-    val onDelete: (Int) -> Unit,
-    val onDetails: (Int) -> Unit
-): RecyclerView.Adapter<ViewHAlert>(){
+class AdapterAlerts(
+    private var alerts: MutableList<Alert>,
+    private val deleteAction: (Int) -> Unit,
+    private val detailsAction: (Int) -> Unit
+) : RecyclerView.Adapter<AdapterAlerts.ViewHolder>() {
 
+    inner class ViewHolder(val binding: ItemAlertBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(alert: Alert, position: Int) {
+            binding.txtNameAlert.text = alert.textShort
 
+            // Al pulsar la CardView completa (opcional) mostramos detalles.
+            binding.root.setOnClickListener { detailsAction(position) }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHAlert {
-        val layoutInflater = LayoutInflater.from(parent.context)//objeto para crear la vista.
-        val layoutItemAlert = R.layout.item_alert  //accedo al xml del item a crear.
-        return ViewHAlert(
-            layoutInflater.inflate(layoutItemAlert, parent, false),
-            onDelete, onDetails
-        )
+            // Botón para ver detalles
+            binding.btnDetailsAlert.setOnClickListener { detailsAction(position) }
+
+            // Botón para eliminar la alerta
+            binding.btnDeleteAlert.setOnClickListener { deleteAction(position) }
+        }
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemAlertBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
+    }
 
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(alerts[position], position)
+    }
 
-    override fun getItemCount(): Int = listAlerts.size
+    override fun getItemCount(): Int = alerts.size
 
-
-
-    override fun onBindViewHolder(holder: ViewHAlert, position: Int) {
-        holder.renderize(listAlerts.get(position), position)  //renderizamos la view.
+    fun updateData(newAlerts: List<Alert>) {
+        alerts.clear()
+        alerts.addAll(newAlerts)
+        notifyDataSetChanged()
     }
 }

@@ -16,15 +16,5 @@ class ViewHUser (view: View,
     }
 
 
-    fun renderize(user: User, position:Int){
-        /*
-        Debemos de setear los campos
-         */
-
-
-        binding.btnDetail.setOnClickListener{
-            onDetails(position)
-        }
-
-    }
+    
 }

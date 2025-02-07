@@ -26,7 +26,7 @@ class ViewHAlert (view: View,
             onDelete(position)
         }
 
-        binding.btnDescriptionAlert.setOnClickListener{
+        binding.btnDetailsAlert.setOnClickListener{
             onDetails(position)
         }
 

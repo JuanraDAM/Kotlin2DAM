@@ -1,13 +1,10 @@
 package com.example.srodenas.example_with_catalogs.domain.users.usecase
 
-import com.example.srodenas.example_with_catalogs.domain.users.models.RepositoryUsers
 import com.example.srodenas.example_with_catalogs.domain.users.models.User
+import com.example.srodenas.example_with_catalogs.repository.IUserRepository
 
-class UseCaseLogin (val repositoryUsers: RepositoryUsers){
-
-
-    suspend fun login(email: String, password: String): User?{
-        return repositoryUsers.isLoginEntity(email, password)
+class UseCaseLogin(private val userRepository: IUserRepository) {
+    suspend fun login(email: String, password: String): User? {
+        return userRepository.login(email, password)
     }
-
 }
