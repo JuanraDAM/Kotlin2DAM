@@ -61,7 +61,7 @@ PescaPro es una aplicación móvil diseñada para los apasionados de la pesca. S
 1. **Clonar el Repositorio:**  
    Abre una terminal y ejecuta el siguiente comando:
    ```bash
-   git clone https://github.com/ejemplo/PescaPro.git
+   git clone https://github.com/JuanraDAM/Kotlin2DAM/tree/mvvmYhit
    ```
    _(Reemplaza la URL por la de tu repositorio real cuando lo tengas disponible.)_
 
