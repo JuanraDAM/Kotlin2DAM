@@ -7,6 +7,5 @@ import dagger.hilt.android.HiltAndroidApp
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        // Aquí puedes inicializar configuraciones globales si lo necesitas.
     }
 }
