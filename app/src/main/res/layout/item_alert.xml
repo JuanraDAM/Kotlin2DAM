@@ -56,19 +56,21 @@
             android:orientation="horizontal"
             android:gravity="end">
 
-            <ImageView
-                android:id="@+id/btn_description_alert"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:contentDescription="View Description"
-                android:src="@drawable/baseline_delete_alert_24" />
-
+            <!-- Botón para eliminar: icono de papelera de eliminación -->
             <ImageView
                 android:id="@+id/btn_delete_alert"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="Delete"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="Delete Alert"
+                android:src="@drawable/baseline_delete_alert_24" />
+
+            <!-- Botón para ver detalles: icono de detalles -->
+            <ImageView
+                android:id="@+id/btn_details_alert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="View Details"
                 android:src="@drawable/baseline_details_alert_24" />
         </LinearLayout>
     </LinearLayout>

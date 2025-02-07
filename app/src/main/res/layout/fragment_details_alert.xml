@@ -1,14 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.views.fragments.DetailsAlertFragment">
+    android:padding="16dp">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</FrameLayout>
+        <!-- Título de la alerta -->
+        <TextView
+            android:id="@+id/txtAlertTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Título de la alerta"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingBottom="8dp"/>
+
+        <!-- Fecha de la alerta -->
+        <TextView
+            android:id="@+id/txtAlertDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fecha: "
+            android:textSize="16sp"
+            android:paddingBottom="8dp"/>
+
+        <!-- Descripción completa -->
+        <TextView
+            android:id="@+id/txtAlertMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Descripción completa de la alerta..."
+            android:textSize="16sp"
+            android:paddingBottom="8dp"/>
+
+        <!-- Botón para cerrar el fragmento (opcional) -->
+        <Button
+            android:id="@+id/btnCloseDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cerrar"/>
+    </LinearLayout>
+</ScrollView>

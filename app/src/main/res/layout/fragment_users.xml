@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.views.fragments.users.UsersFragment">
+    android:orientation="vertical">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/my_recycler_view_users"
+        android:id="@+id/recyclerViewUsers"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="25dp"
-
-
-        />
-
-
-
-</FrameLayout>
+        android:layout_height="match_parent"/>
+</LinearLayout>

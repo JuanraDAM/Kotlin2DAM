@@ -8,12 +8,16 @@
     <string name="users">Usuarios</string>
     <string name="profile">Perfil</string>
 
-
+    <!-- Claves para SharedPreferences -->
     <string name="pref_user_file">user_prefs</string>
     <string name="pref_user_id">id</string>
     <string name="pref_user_name">name</string>
     <string name="pref_user_email">email</string>
 
+    <!-- Valores por defecto para el usuario -->
     <string name="default_user_name">desconocido</string>
     <string name="default_user_email">sin email</string>
+
+    <!-- Clave para el botón de logout -->
+    <string name="logout_button">Cerrar sesión</string>
 </resources>

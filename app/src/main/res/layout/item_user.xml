@@ -1,104 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="30dp"
-    app:cardElevation="10dp"
-    >
-
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    >
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp">
 
-    <ImageView
-        android:id="@+id/iv_user"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:background="@color/black" />
-
-    <TextView
-        android:id="@+id/txtview_name"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="Name ver"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        app:layout_constraintStart_toEndOf="@id/iv_user"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/txtview_city"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/iv_user"
-        app:layout_constraintTop_toBottomOf="@id/txtview_name"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text="City para ver"
-        android:textColor = "@color/purple_700"
-        android:textSize = "14sp"
-        android:layout_marginTop="15dp"
-        />
+        <!-- Imagen del usuario -->
+        <ImageView
+            android:id="@+id/iv_user"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/ic_launcher_foreground"/>
 
-    <TextView
-        android:id="@+id/txtview_province"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/iv_user"
-        app:layout_constraintTop_toBottomOf="@id/txtview_city"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text="Provincia para ver"
-        android:textColor = "@color/purple_500"
-        android:textSize = "14sp"
-        />
+        <!-- Nombre del usuario -->
+        <TextView
+            android:id="@+id/txtview_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Nombre"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@id/iv_user"
+            app:layout_constraintTop_toTopOf="@id/iv_user"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="8dp" />
 
-    <TextView
-        android:id="@+id/txtview_phone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/iv_user"
-        app:layout_constraintTop_toBottomOf="@id/txtview_province"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text="000 000 000"
-        android:textColor = "@color/purple_500"
-        android:textSize = "20sp"
-        />
+        <!-- Email del usuario -->
+        <TextView
+            android:id="@+id/txtview_email"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Email"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/iv_user"
+            app:layout_constraintTop_toBottomOf="@id/txtview_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="8dp" />
 
+        <!-- Teléfono del usuario -->
+        <TextView
+            android:id="@+id/txtview_phone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Teléfono"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/iv_user"
+            app:layout_constraintTop_toBottomOf="@id/txtview_email"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="8dp" />
 
+        <!-- Botón de eliminar -->
+        <ImageView
+            android:id="@+id/btn_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_delete_alert_24"
+            android:contentDescription="Eliminar usuario"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/btn_delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_person_add_disabled_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/txtview_phone"
-        app:layout_constraintTop_toBottomOf="@id/txtview_phone"
-        app:layout_constraintHorizontal_bias="0.1"/>
+        <!-- Botón de editar nombre -->
+        <ImageView
+            android:id="@+id/btn_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_details_24"
+            android:contentDescription="Editar nombre"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    <ImageView
-        android:id="@+id/btn_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_details_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/btn_delete"
-        app:layout_constraintTop_toBottomOf="@id/txtview_phone"
-        app:layout_constraintHorizontal_bias="0.1"
-        />
-
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
+
+
