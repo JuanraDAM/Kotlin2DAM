@@ -1,179 +1,44 @@
-# Proyecto: Dog API Clean Architecture IES Virgen del Carmen, Jaén 23/24
+# Dog API Clean Architecture - Caso 5: Eliminar un Perro Individual
 
-Este repositorio contiene la implementación de una aplicación basada en **Clean Architecture** para gestionar información sobre perros. Se han utilizado diferentes capas y principios de arquitectura limpia para mantener la separación de responsabilidades.
+## Objetivo de la Tarea
 
-## 🚀 Descripción
-La idea de esta rama, es ver una separación clara entre nuestro domain y la data. Para ello, he planteado un modelo de dominio genérico, llamado DogModel y desde cada uno de las data su propio modelo.
-Hay que recordar que en la rama main, teníamos una representación sólo con datos desde memoria, en el que simulábamos un acceso a algún repositorio remoto por medio de un Service y el tipo de dato Pair, es el 
-que nos devolvía dicho servicio. Para entenderlo, hay que imaginarnos una relación entre un Pair y un registro por ejemplo de una BBDD. En la versión inicial, el repositorio devolvía los datos en forma de Dog, considerado
-como un modelo del dominio.
+El objetivo de esta tarea es modificar la aplicación para que se pueda **eliminar un perro individual**. Además, si tras borrar un perro la base de datos queda vacía, se recargan los perros de forma nativa (como ocurre cuando se borra toda la base de datos).
 
-En este caso, al tener dos fuentes de datos bien diferenciados, necesitamos un modelo común en el dominio y unas funciones de extensión que realicen los respectivos mapeos. El repositorio, mantendrá los mismos
-métodos de acceso a datos utilizados en el repositorio del #main.
+## ¿Qué se ha hecho?
 
-### 🗂 Cambios a realizar para prácticar con Room
-Sería muy interesante, trabajar con un crud en la BBDD, como insertar, eliminar y editar. Así podríamos trabajar con el crud desde la BBDD, borrar la BBDD y ver como se vuelven a coger los datos de forma nativa en memoria.
+1. **Nuevo Caso de Uso (DeleteDogUseCase):**  
+   Se ha creado un caso de uso llamado `DeleteDogUseCase` que se encarga de:
+   - Eliminar un perro individual de la base de datos.
+   - Verificar si, después de la eliminación, no quedan perros en la base de datos.  
+     Si es así, se vuelven a cargar los perros que vienen por defecto (datos nativos).
 
-### Modelos en la data:
-`data\mem\Pair<String><String>`: Modelo de datos de la data simulando un acceso a datos nativos.
-`data\database\DogEntity`: Modelo de datos de Room
+2. **Modificación en la UI (Interfaz de Usuario):**
+   - En el layout del item del RecyclerView (`item_dog.xml`), se ha añadido un botón "Eliminar".
+   - En el ViewHolder correspondiente se ha configurado ese botón para que, mediante una lambda, llame al método de eliminación del ViewModel.
+   - El adaptador (`DogAdapter`) se encarga de pasar esta lambda a cada ViewHolder.
 
+3. **Actualización del ViewModel:**
+   - Se añadió un método `deleteDog(dog: Dog)` en el ViewModel.  
+     Este método se encarga de llamar al `DeleteDogUseCase` para eliminar el perro y luego actualizar la lista de perros que se muestra en la pantalla.
 
+## Cambios y Mejoras Propuestas
 
-## 📌 Arquitectura
-El diagrama de clases se ha generado utilizando **PlantUML** y representa la estructura del proyecto:
+Aunque la funcionalidad ya cumple con lo solicitado, se han observado algunos aspectos que se podrían mejorar:
 
+- **Manejo del Identificador (ID):**
+   - **Lo que pasaba:**  
+     Al convertir el objeto de dominio (`Dog`) a la entidad de base de datos (`DogEntity`), el ID se perdía (se usaba un valor por defecto).
+   - **Cambio realizado:**  
+     Se ha modificado el mapeo para que se preserve el ID, lo que permite que Room sepa exactamente qué registro eliminar.
 
-```plantuml
+- **Uso de Variables Globales:**
+   - **Situación actual:**  
+     La lista de perros se guarda en un objeto global (`Repository.dogs`), lo que puede complicar la actualización y el mantenimiento.
+   - **Propuesta de mejora:**  
+     Manejar el estado de la lista directamente en el ViewModel (por ejemplo, usando LiveData o Kotlin Flow) para que la actualización de la UI sea más directa y menos dependiente de variables globales.
 
-@startuml
-package "Data Layer" {
-    package "mem" {
-        package "service" {
-            interface DogServiceInterface {
-                + getDogs(): List<Pair<String, String>>
-                + getBreedDogs(breed: String): List<Pair<String, String>>
-            }
-            
-            class DogService {
-                + getDogs(): List<Pair<String, String>>
-                + getBreedDogs(breed: String): List<Pair<String, String>>
-            }
-            DogService ..|> DogServiceInterface
-        }
-        
-        class Dogs {
-            + dogs: List<Pair<String, String>>
-        }
-    }
-    
-    package "database" {
-        class DatabaseDogs {
-            + dogDao(): DogDao
-        }
-        
-        package "dao" {
-            class DogDao {
-                + insert(dog: DogEntity): void
-                + getAllDogs(): List<DogEntity>
-            }
-        }
-        
-        package "entities" {
-            class DogEntity {
-                - id: int = 0
-                - breed: String
-                - image: String
-            }
-        }
-    }
-    
-    class DogRepository {
-        + findById(id: int): Dog
-        + save(dog: Dog): void
-    }
-}
-
-package "Domain Layer" {
-    class Dog {
-        - id: int
-        - breed: String
-        - image: String
-    }
-    
-    interface DogRepositoryInterface {
-        + findById(id: int): Dog
-        + save(dog: Dog): void
-    }
-    
-    class DogExtension {
-        + toDogEntity(entity: DogEntity): Dog
-        + toDogEntity(pair: Pair<String, String>): Dog
-        + toDogEntity(model: Dog): DogEntity
-    }
-    
-    package "usecase" {
-        class DeleteDogsFromDatabase {
-            + execute(): void
-        }
-        
-        class GetDogsBreedUseCase {
-            + execute(breed: String): List<Dog>
-        }
-        
-        class GetDogsUseCase {
-            + execute(): List<Dog>
-        }
-    }
-    
-    package "framework" {
-        class RoomModule {
-            + provideRoom(context: ApplicationContext): DatabaseDogs
-            + provideDao(database: DatabaseDogs): DogDao
-        }
-    }
-}
-
-package "UI Layer" {
-    package "adapter" {
-    }
-    package "modelview" {
-    }
-    package "views" {
-    }
-}
-
-DogRepositoryInterface <|.. DogRepository
-DogRepository ..> DogEntity : "Uses"
-DogRepository ..> Dog : "Uses"
-DogRepository ..> DogExtension : "Uses"
-DogExtension ..> DogEntity : "Maps to"
-DogExtension ..> Dog : "Maps to"
-DatabaseDogs ..> DogDao : "Uses"
-DogDao ..> DogEntity : "Manages"
-DogService ..> Dogs : "Uses"
-RoomModule ..> DatabaseDogs : "Creates"
-RoomModule ..> DogDao : "Provides"
-
-"UI Layer" ..> "usecase" : "Uses"
-"usecase" ..> DogRepositoryInterface : "Uses"
-@enduml
-```
-
-
-
-## 📂 Capas de la Arquitectura
-
-### 🗂 Data Layer
-- `mem`: Contiene modelos de datos, servicios y el repositorio de objetos.
-- `database`: Implementa la persistencia con Room e incluye DAOs y entidades.
-- `DogRepository`: Implementa la interfaz del repositorio para conectar con la capa de dominio.
-
-### 📌 Domain Layer
-- `Dog`: Modelo de datos de la aplicación.
-- `DogRepositoryInterface`: Interfaz del repositorio.
-- `DogExtension`: Métodos de extensión para transformar entidades.
-- `usecase`: Casos de uso principales.
-
-### 🎨 UI Layer
-- `adapter`: Adaptadores para la presentación.
-- `modelview`: Implementación del patrón MVVM.
-- `views`: Componentes de interfaz gráfica.
-
-## 🚀 Instalación y Uso
-1. Clona el repositorio:
-   ```sh
-   git clone https://github.com/tu-usuario/dogApi-clean.git
-   ```
-2. Abre el proyecto en tu IDE favorito.
-3. Asegúrate de que tienes configurada la base de datos Room.
-4. Ejecuta la aplicación y disfruta.
-
-## 📌 Contribuciones
-¡Cualquier contribución es bienvenida! Siéntete libre de hacer un `fork` y enviar un `pull request`.
-
-## 📜 Propietario
-Este proyecto ha sido desarrollado por **Santiago Rodenas Herráiz**, profesor de **2DAM Programación Multimedia**, especializado en los módulos de **Programación de Dispositivos Móviles** y **Programación de Servicios y Procesos**.
-
-## 📜 Licencia
-Este proyecto está bajo la licencia MIT. ¡Disfrútalo y úsalo libremente!
+- **Actualización de la Lista:**
+   - **Situación actual:**  
+     Tras borrar un perro, se vuelve a recargar toda la lista desde la base de datos.
+   - **Propuesta de mejora:**  
+     Actualizar únicamente el elemento eliminado en la lista, lo que haría que la aplicación sea más rápida y eficiente.

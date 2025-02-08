@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.models.Dog
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.usercase.DeleteDogsFromDataBaseUseCase
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.usercase.GetDogsBreedUseCase
+import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.usercase.DeleteDogUseCase
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.usercase.GetDogsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -43,75 +44,67 @@ cuando se llame al método get del provider. De esta forma, aseguramos que se cu
  */
 @HiltViewModel
 class DogViewModel @Inject constructor(
-    private val useCaseList : GetDogsUseCase,
+    private val useCaseList: GetDogsUseCase,
     private val getDogsBreedUseCase: GetDogsBreedUseCase,
-    private val userCaseDeleteDatabase : DeleteDogsFromDataBaseUseCase
+    private val userCaseDeleteDatabase: DeleteDogsFromDataBaseUseCase,
+    private val deleteDogUseCase: DeleteDogUseCase  // <-- Parámetro nuevo
+) : ViewModel() {
 
-): ViewModel() {
-
-
-    var dogListLiveData = MutableLiveData<List<Dog>>() //repositorio observable
-    var progressBarLiveData = MutableLiveData<Boolean> () //progressbar observable
-    var breed = MutableLiveData<String>() //para el campo search con la raza.
+    var dogListLiveData = MutableLiveData<List<Dog>>() // repositorio observable
+    var progressBarLiveData = MutableLiveData<Boolean>() // progressbar observable
+    var breed = MutableLiveData<String>() // para el campo search con la raza.
 
     fun list() {
         viewModelScope.launch {
-            progressBarLiveData.value = true //notifico
+            progressBarLiveData.value = true // notifico
             delay(500)
-           // useCaseList = GetDogsUseCase()  //Ya no me hace falta, porque se crea por Hilt.
-            var data : List<Dog> ?
-            withContext(Dispatchers.IO){
-                data  = useCaseList()  //aquí se invoca y se obtienen los datos.
+            var data: List<Dog>?
+            withContext(Dispatchers.IO) {
+                data = useCaseList()  // se invoca y se obtienen los datos.
             }
-           // var data : List<Dog> ? = useCaseList()  //aquí se invoca y se obtienen los datos.
             data.let {
-                dogListLiveData.value = it  //notifico
-                progressBarLiveData.value = false  //notifico
+                dogListLiveData.value = it  // notifico
+                progressBarLiveData.value = false  // notifico
             }
         }
     }
-
-
 
     fun listForBreed(breed: String) {
         viewModelScope.launch {
-            progressBarLiveData.value = true //notifico
+            progressBarLiveData.value = true // notifico
             delay(500)
-            var data : List<Dog> ?
-
-            withContext(Dispatchers.IO){
-                getDogsBreedUseCase.setBreed(breed) //primero tenemos que setear, antes de llamar al caso de uso
-                data  = getDogsBreedUseCase()  //aquí se invoca y se obtienen los datos.
+            var data: List<Dog>?
+            withContext(Dispatchers.IO) {
+                getDogsBreedUseCase.setBreed(breed)  // setear la raza antes de invocar el caso de uso
+                data = getDogsBreedUseCase()  // se obtienen los datos.
             }
             data.let {
-                dogListLiveData.value = it  //notifico
-                progressBarLiveData.value = false  //notifico
+                dogListLiveData.value = it  // notifico
+                progressBarLiveData.value = false  // notifico
             }
         }
     }
 
-    fun searchByBreed(breed: String){
-        //Log.i("TAG-DOGS", "La raza elegida es $breed")
-        this.breed.value = breed  //notificamos cambio
+    fun searchByBreed(breed: String) {
+        this.breed.value = breed  // notificamos cambio
     }
-
-    /*
-    Este caso de uso, es para eliminar los datos de la base de datos.
-
-    Para que fuera óptimo, se debería borrar en la BBDD y al mismo tiempo en memoria.
-    Después en vez de llamar a list(), sería actualizar un MutableListData<List<Dog>>
-    de esa forma, se actualizaría el adptador y no habría que volver a recuperar los datos
-    de la BBDD.
-     */
-
 
     fun delete() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                userCaseDeleteDatabase() //si invocamos para borrar la base de datos.
+            withContext(Dispatchers.IO) {
+                userCaseDeleteDatabase() // elimina todos los datos de la BBDD.
             }
-            list() //Vuelvo a cargar los datos desde Dogs. Lo hacemos así, por sencillez, pero no es óptimo.
+            list() // vuelve a cargar los datos desde Dogs.
         }
     }
 
+    fun deleteDog(dog: Dog) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                // Invoca el caso de uso para eliminar el perro individual
+                deleteDogUseCase(dog)
+            }
+            list() // Actualiza la lista de perros tras la eliminación.
+        }
+    }
 }

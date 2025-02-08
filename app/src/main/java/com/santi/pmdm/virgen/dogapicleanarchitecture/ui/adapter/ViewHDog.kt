@@ -6,28 +6,25 @@ import com.bumptech.glide.Glide
 import com.santi.pmdm.virgen.dogapicleanarchitecture.databinding.ItemDogBinding
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.models.Dog
 
-/*
-Se encargará de inicializar las vistas, elemento por elemento. Pondrá todos los datos que le pasa el adaptador.
- */
-class ViewHDog(view: View) : RecyclerView.ViewHolder(view){
+class ViewHDog(view: View) : RecyclerView.ViewHolder(view) {
 
-    private lateinit var binding: ItemDogBinding
+    private val binding: ItemDogBinding = ItemDogBinding.bind(view)
 
-    init {
-        binding = ItemDogBinding.bind(view)
-    }
-
-
-    /*
-    Métdo que se encara de mapear los item por propiedad del modelo.
+    /**
+     * Método que asigna los datos del perro y configura el botón de eliminación.
+     * @param dog: Objeto Dog a renderizar.
+     * @param onDelete: Lambda que se invoca cuando se pulsa el botón de eliminar.
      */
-    fun rendereize(get: Dog, position: Int) {
-        Glide
-            .with(itemView.context)
-            .load(get.image)
+    fun rendereize(dog: Dog, onDelete: (Dog) -> Unit) {
+        // Cargar la imagen
+        Glide.with(itemView.context)
+            .load(dog.image)
             .centerCrop()
             .into(binding.ivImagen)
 
+        // Configurar el botón de eliminar
+        binding.btnDelete.setOnClickListener {
+            onDelete(dog)
+        }
     }
-
 }

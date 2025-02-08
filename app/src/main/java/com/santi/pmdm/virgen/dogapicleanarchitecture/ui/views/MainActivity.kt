@@ -133,8 +133,12 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
      */
     private fun initRecyclerView(){
         binding.myRecyclerPpal.layoutManager = LinearLayoutManager(this)
-        adapter = DogAdapter()
+        adapter = DogAdapter { dog ->
+            // Invocar la acción de eliminación en el ViewModel para el perro seleccionado.
+            dogViewModel.deleteDog(dog)
+        }
     }
+
 
 
     /*
