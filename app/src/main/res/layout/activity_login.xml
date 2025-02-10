@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingBottom="40dp"
-    tools:context=".LoginActivity">
+    tools:context=".ui.views.activities.LoginActivity">
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar

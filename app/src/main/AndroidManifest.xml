@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.proyectoevaluable"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Declaración de permisos -->
+    <!-- Permisos necesarios -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <!-- Indica que la cámara es opcional -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
@@ -34,7 +34,7 @@
         </provider>
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".ui.views.activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,10 +43,8 @@
         </activity>
 
         <activity
-            android:name=".ListActivity"
+            android:name=".ui.views.activities.ListActivity"
             android:exported="false">
         </activity>
     </application>
-
-
 </manifest>
