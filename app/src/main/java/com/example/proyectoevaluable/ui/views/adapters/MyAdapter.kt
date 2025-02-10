@@ -1,6 +1,5 @@
-package com.example.proyectoevaluable
+package com.example.proyectoevaluable.ui.views.adapters
 
-import android.app.AlertDialog
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
@@ -10,7 +9,10 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import com.example.proyectoevaluable.R
+import com.example.proyectoevaluable.domain.cards.models.Card
 
 class MyAdapter(
     private val context: Context,
@@ -30,7 +32,6 @@ class MyAdapter(
         holder.titleTextView.text = card.username
         holder.descriptionTextView.text = card.password
 
-        // Mostrar el peso en kg
         val weightInKg = card.weight?.let { "$it kg" } ?: "-- kg"
         holder.weightTextView.text = "Peso: $weightInKg"
 
@@ -58,7 +59,6 @@ class MyAdapter(
         }
     }
 
-    // Función para mostrar la imagen ampliada en un AlertDialog
     private fun showImageDialog(photoUri: String?) {
         if (photoUri.isNullOrEmpty()) {
             Toast.makeText(context, "No hay imagen para mostrar", Toast.LENGTH_SHORT).show()
@@ -70,7 +70,7 @@ class MyAdapter(
         val imageView = dialogView.findViewById<ImageView>(R.id.dialog_image_view)
         imageView.setImageURI(Uri.parse(photoUri))
         dialog.setView(dialogView)
-        dialog.setCanceledOnTouchOutside(true)  // Permite cerrar al tocar fuera
+        dialog.setCanceledOnTouchOutside(true)
         dialog.window?.setLayout(
             (context.resources.displayMetrics.widthPixels * 0.7).toInt(),
             (context.resources.displayMetrics.heightPixels * 0.7).toInt()

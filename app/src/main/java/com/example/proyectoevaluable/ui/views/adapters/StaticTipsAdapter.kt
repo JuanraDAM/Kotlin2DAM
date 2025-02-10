@@ -1,4 +1,4 @@
-package com.example.proyectoevaluable
+package com.example.proyectoevaluable.ui.views.adapters
 
 import android.net.Uri
 import android.view.LayoutInflater
@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.proyectoevaluable.R
+import com.example.proyectoevaluable.domain.cards.models.Card
 
 class StaticTipsAdapter(
     private val items: List<Card>

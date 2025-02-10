@@ -1,4 +1,4 @@
-package com.example.proyectoevaluable
+package com.example.proyectoevaluable.domain.cards.models
 
 data class Card(
     var username: String,

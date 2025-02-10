@@ -1,4 +1,4 @@
-package com.example.proyectoevaluable
+package com.example.proyectoevaluable.ui.views.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,11 +13,17 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.proyectoevaluable.R
+import com.example.proyectoevaluable.domain.cards.models.Card
+import com.example.proyectoevaluable.ui.viewmodel.cards.ListViewModel
+import com.example.proyectoevaluable.ui.views.fragments.CardDialogFragment
+import com.example.proyectoevaluable.ui.views.fragments.FishingTipsFragment
+import com.example.proyectoevaluable.ui.views.fragments.UserFragment
+import com.example.proyectoevaluable.ui.views.adapters.MyAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ListActivity : AppCompatActivity() {
@@ -25,14 +31,10 @@ class ListActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private var adapter: MyAdapter? = null
 
-    // DrawerLayout y NavigationView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
 
     private val viewModel: ListViewModel by viewModels()
-
-    @Inject
-    lateinit var cardRepository: CardRepository
 
     private val items = mutableListOf<Card>()
 
@@ -40,7 +42,6 @@ class ListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-        // Verificar si hay un usuario autenticado
         val firebaseUser = FirebaseAuth.getInstance().currentUser
         if (firebaseUser == null) {
             startActivity(Intent(this, LoginActivity::class.java))
@@ -48,29 +49,21 @@ class ListActivity : AppCompatActivity() {
             return
         }
 
-        // Referencias a vistas
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.navigation_view)
         val menuButton = findViewById<ImageView>(R.id.button_menu)
         recyclerView = findViewById(R.id.recyclerView)
         val addButton = findViewById<FloatingActionButton>(R.id.button_add)
 
-        // Configurar RecyclerView con adaptador
         setUpRecyclerView()
 
-        // Configurar eventos del NavigationView
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile -> {
-                    // Mostramos el fragment de perfil (UserFragment)
                     showUserFragment()
                 }
                 R.id.nav_main_list -> {
-                    // Si es la lista principal, cerramos cualquier fragment
-                    supportFragmentManager.popBackStack(
-                        null,
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-                    )
+                    supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 }
                 R.id.nav_second_list -> {
                     val container = findViewById<FrameLayout>(R.id.fragmentContainer)
@@ -81,7 +74,6 @@ class ListActivity : AppCompatActivity() {
                         .commit()
                 }
                 R.id.nav_logout -> {
-                    // Lógica para cerrar sesión
                     FirebaseAuth.getInstance().signOut()
                     startActivity(Intent(this, LoginActivity::class.java))
                     finish()
@@ -91,18 +83,15 @@ class ListActivity : AppCompatActivity() {
             true
         }
 
-        // Al hacer click en el botón hamburguesa, abrimos el Drawer
         menuButton.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
-        // Botón flotante para añadir tarjetas
         addButton.setOnClickListener {
             showAddCardDialog()
         }
 
-        // Botones de la navegación inferior
-        // Se ha renombrado el id para evitar conflictos: de nav_profile a bottom_nav_profile
+        // Botones de navegación inferior
         val bottomProfileButton = findViewById<ImageView>(R.id.nav_profile)
         bottomProfileButton.setOnClickListener {
             showUserFragment()
@@ -110,10 +99,7 @@ class ListActivity : AppCompatActivity() {
 
         val navHome = findViewById<ImageView>(R.id.nav_home)
         navHome.setOnClickListener {
-            supportFragmentManager.popBackStack(
-                null,
-                FragmentManager.POP_BACK_STACK_INCLUSIVE
-            )
+            supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
             findViewById<FrameLayout>(R.id.fragmentContainer).visibility = View.GONE
             findViewById<View>(R.id.viewOverlayDim).visibility = View.GONE
         }
@@ -128,14 +114,12 @@ class ListActivity : AppCompatActivity() {
                 .commit()
         }
 
-        // Observar los cambios en la lista de tarjetas
         viewModel.cards.observe(this, Observer { cards ->
             items.clear()
             items.addAll(cards)
             adapter?.notifyDataSetChanged()
         })
 
-        // Cargar las tarjetas
         viewModel.loadCards()
     }
 
@@ -162,7 +146,6 @@ class ListActivity : AppCompatActivity() {
                 weight = weight,
                 photoUri = photoUri?.toString()
             )
-            // Agregamos la tarjeta a la lista y actualizamos mediante el ViewModel
             val newList = items.toMutableList().apply { add(card) }
             viewModel.saveCards(newList)
         }
@@ -177,12 +160,10 @@ class ListActivity : AppCompatActivity() {
             initialWeight = card.weight,
             initialPhotoUri = card.photoUri
         ) { title, description, weight, photoUri ->
-            // Actualizamos la tarjeta
             card.username = title
             card.password = description
             card.weight = weight
             card.photoUri = photoUri?.toString()
-            // Notificamos el cambio al adapter y guardamos una nueva instancia de la lista
             adapter?.notifyItemChanged(position)
             viewModel.saveCards(items.toMutableList())
         }
@@ -190,7 +171,6 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun showUserFragment() {
-        // Muestra el fragment de perfil (UserFragment) en el contenedor correspondiente
         val overlay = findViewById<View>(R.id.viewOverlayDim)
         overlay.visibility = View.VISIBLE
         val container = findViewById<FrameLayout>(R.id.fragmentContainer)

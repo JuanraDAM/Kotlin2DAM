@@ -1,4 +1,4 @@
-package com.example.proyectoevaluable
+package com.example.proyectoevaluable.ui.views.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,25 +7,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.proyectoevaluable.R
+import com.example.proyectoevaluable.domain.cards.models.Card
+import com.example.proyectoevaluable.ui.views.adapters.StaticTipsAdapter
 
 class FishingTipsFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: MyAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_fishing_tips, container, false)
-
-        // Referencia al RecyclerView
         recyclerView = view.findViewById(R.id.recyclerViewTips)
-
-        // Configurar RecyclerView con adaptador
         setUpRecyclerView()
-
         return view
     }
 
@@ -67,6 +63,4 @@ class FishingTipsFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
     }
-
-
 }

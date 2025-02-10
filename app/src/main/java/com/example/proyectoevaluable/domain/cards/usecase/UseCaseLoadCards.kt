@@ -1,0 +1,8 @@
+package com.example.proyectoevaluable.domain.cards.usecase
+
+import com.example.proyectoevaluable.domain.cards.models.Card
+import com.example.proyectoevaluable.domain.cards.repository.CardRepository
+
+class UseCaseLoadCards(private val repository: CardRepository) {
+    suspend operator fun invoke(): List<Card> = repository.loadCards()
+}

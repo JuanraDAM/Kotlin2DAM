@@ -1,4 +1,4 @@
-package com.example.proyectoevaluable
+package com.example.proyectoevaluable.ui.views.fragments
 
 import android.Manifest
 import android.app.AlertDialog
@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.DialogFragment
+import com.example.proyectoevaluable.R
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -43,12 +44,11 @@ class CardDialogFragment(
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.dialog_card, null)
 
-        val titleEditText: EditText = view.findViewById(R.id.titleEditText)
-        val descriptionEditText: EditText = view.findViewById(R.id.descriptionEditText)
-        val weightEditText: EditText = view.findViewById(R.id.weightEditText)
-        val selectPhotoImageView: ImageView = view.findViewById(R.id.selectPhotoImageView)
+        val titleEditText = view.findViewById<EditText>(R.id.titleEditText)
+        val descriptionEditText = view.findViewById<EditText>(R.id.descriptionEditText)
+        val weightEditText = view.findViewById<EditText>(R.id.weightEditText)
+        val selectPhotoImageView = view.findViewById<ImageView>(R.id.selectPhotoImageView)
 
-        // Inicializar con datos previos si existen
         titleEditText.setText(initialTitle)
         descriptionEditText.setText(initialDescription)
         weightEditText.setText(initialWeight)
@@ -125,7 +125,7 @@ class CardDialogFragment(
 
     private fun createImageFile(): File? {
         return try {
-            val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
             val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir).apply {
                 currentPhotoPath = absolutePath
