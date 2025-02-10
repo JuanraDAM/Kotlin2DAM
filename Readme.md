@@ -95,8 +95,7 @@ El proyecto se organiza siguiendo los principios de Clean Architecture y MVVM pa
 
 ```plaintext
 PescaPro/
-├── application
-│   └── MyApplication.kt
+├── MyApplication.kt
 ├── data
 │   └── cards
 │       ├── datasource
