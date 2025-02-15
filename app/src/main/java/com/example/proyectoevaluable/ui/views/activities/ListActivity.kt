@@ -1,14 +1,17 @@
 package com.example.proyectoevaluable.ui.views.activities
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.proyectoevaluable.R
 import com.example.proyectoevaluable.domain.cards.models.Card
 import com.example.proyectoevaluable.ui.viewmodel.cards.ListViewModel
+import com.example.proyectoevaluable.ui.views.activities.LoginActivity
 import com.example.proyectoevaluable.ui.views.fragments.CardDialogFragment
 import com.example.proyectoevaluable.ui.views.fragments.FishingTipsFragment
 import com.example.proyectoevaluable.ui.views.fragments.UserFragment
@@ -24,6 +28,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 
 @AndroidEntryPoint
 class ListActivity : AppCompatActivity() {
@@ -35,12 +40,13 @@ class ListActivity : AppCompatActivity() {
     private lateinit var navigationView: NavigationView
 
     private val viewModel: ListViewModel by viewModels()
-
     private val items = mutableListOf<Card>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
+
+        // No limpiamos la persistencia, para que las cards guardadas persistan
 
         val firebaseUser = FirebaseAuth.getInstance().currentUser
         if (firebaseUser == null) {
@@ -59,9 +65,7 @@ class ListActivity : AppCompatActivity() {
 
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_profile -> {
-                    showUserFragment()
-                }
+                R.id.nav_profile -> showUserFragment()
                 R.id.nav_main_list -> {
                     supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 }
@@ -83,29 +87,17 @@ class ListActivity : AppCompatActivity() {
             true
         }
 
-        menuButton.setOnClickListener {
-            drawerLayout.openDrawer(GravityCompat.START)
-        }
-
-        addButton.setOnClickListener {
-            showAddCardDialog()
-        }
+        menuButton.setOnClickListener { drawerLayout.openDrawer(GravityCompat.START) }
+        addButton.setOnClickListener { showAddCardDialog() }
 
         // Botones de navegación inferior
-        val bottomProfileButton = findViewById<ImageView>(R.id.nav_profile)
-        bottomProfileButton.setOnClickListener {
-            showUserFragment()
-        }
-
-        val navHome = findViewById<ImageView>(R.id.nav_home)
-        navHome.setOnClickListener {
+        findViewById<ImageView>(R.id.nav_profile).setOnClickListener { showUserFragment() }
+        findViewById<ImageView>(R.id.nav_home).setOnClickListener {
             supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
             findViewById<FrameLayout>(R.id.fragmentContainer).visibility = View.GONE
             findViewById<View>(R.id.viewOverlayDim).visibility = View.GONE
         }
-
-        val navInfo = findViewById<ImageView>(R.id.nav_info)
-        navInfo.setOnClickListener {
+        findViewById<ImageView>(R.id.nav_info).setOnClickListener {
             val container = findViewById<FrameLayout>(R.id.fragmentContainer)
             container.visibility = View.VISIBLE
             supportFragmentManager.beginTransaction()
@@ -132,19 +124,61 @@ class ListActivity : AppCompatActivity() {
             },
             onEditClicked = { position ->
                 showEditCardDialog(position)
+            },
+            onMapsClicked = { position ->
+                // Al pulsar el botón de Maps en la card, se utiliza la ubicación almacenada en la card.
+                openMapForCard(items[position])
             }
         )
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
     }
 
+    private fun openMapForCard(card: Card) {
+        if (card.photoUri.isNullOrEmpty()) {
+            Toast.makeText(this, "No hay imagen para extraer ubicación", Toast.LENGTH_SHORT).show()
+            return
+        }
+        // Se asume que la URI es de un archivo guardado en almacenamiento interno.
+        val file = File(Uri.parse(card.photoUri).path ?: "")
+        try {
+            val exif = ExifInterface(file.absolutePath)
+            val latLong = FloatArray(2)
+            if (exif.getLatLong(latLong)) {
+                openMapWithCoordinates(latLong[0].toDouble(), latLong[1].toDouble())
+            } else {
+                // Si en la card ya se habían extraído y guardado datos de ubicación, usarlos:
+                if (card.latitude != null && card.longitude != null) {
+                    openMapWithCoordinates(card.latitude!!, card.longitude!!)
+                } else {
+                    Toast.makeText(this, "La imagen no contiene datos de ubicación", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error al obtener ubicación: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun openMapWithCoordinates(latitude: Double, longitude: Double) {
+        val geoUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=$latitude,$longitude")
+        val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
+        val chooser = Intent.createChooser(mapIntent, "Elige una aplicación de mapas")
+        if (chooser.resolveActivity(packageManager) != null) {
+            startActivity(chooser)
+        } else {
+            Toast.makeText(this, "No se encontró una aplicación de mapas", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun showAddCardDialog() {
-        val dialog = CardDialogFragment { title, description, weight, photoUri ->
+        val dialog = CardDialogFragment { title, description, weight, photoUri, lat, lon ->
             val card = Card(
                 username = title,
                 password = description,
                 weight = weight,
-                photoUri = photoUri?.toString()
+                photoUri = photoUri?.toString(),
+                latitude = lat,
+                longitude = lon
             )
             val newList = items.toMutableList().apply { add(card) }
             viewModel.saveCards(newList)
@@ -159,11 +193,13 @@ class ListActivity : AppCompatActivity() {
             initialDescription = card.password,
             initialWeight = card.weight,
             initialPhotoUri = card.photoUri
-        ) { title, description, weight, photoUri ->
+        ) { title, description, weight, photoUri, lat, lon ->
             card.username = title
             card.password = description
             card.weight = weight
             card.photoUri = photoUri?.toString()
+            card.latitude = lat
+            card.longitude = lon
             adapter?.notifyItemChanged(position)
             viewModel.saveCards(items.toMutableList())
         }

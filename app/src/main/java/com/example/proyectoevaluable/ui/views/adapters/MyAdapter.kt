@@ -18,7 +18,8 @@ class MyAdapter(
     private val context: Context,
     private val items: MutableList<Card>,
     private val onDeleteConfirmed: (Int) -> Unit,
-    private val onEditClicked: (Int) -> Unit
+    private val onEditClicked: (Int) -> Unit,
+    private val onMapsClicked: (Int) -> Unit  // Callback para el botón de maps
 ) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -57,6 +58,11 @@ class MyAdapter(
                 .setNegativeButton("No", null)
                 .show()
         }
+
+        // Callback para el botón de maps
+        holder.mapsButton.setOnClickListener {
+            onMapsClicked(position)
+        }
     }
 
     private fun showImageDialog(photoUri: String?) {
@@ -64,7 +70,6 @@ class MyAdapter(
             Toast.makeText(context, "No hay imagen para mostrar", Toast.LENGTH_SHORT).show()
             return
         }
-
         val dialog = AlertDialog.Builder(context).create()
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_image, null)
         val imageView = dialogView.findViewById<ImageView>(R.id.dialog_image_view)
@@ -87,5 +92,7 @@ class MyAdapter(
         val weightTextView: TextView = itemView.findViewById(R.id.item_weight)
         val editButton: ImageButton = itemView.findViewById(R.id.edit_button)
         val deleteButton: ImageButton = itemView.findViewById(R.id.delete_button)
+        // Referencia al botón de maps
+        val mapsButton: ImageButton = itemView.findViewById(R.id.maps_button)
     }
 }
