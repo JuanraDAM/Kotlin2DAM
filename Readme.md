@@ -1,15 +1,16 @@
 # PescaPro
 
-PescaPro es una aplicación móvil diseñada para los apasionados de la pesca. Su objetivo es facilitar el registro y gestión de las capturas realizadas, permitiendo almacenar detalles como el nombre o título, descripción, peso y una imagen opcional de cada pieza capturada. Además, la app ofrece útiles consejos para mejorar la experiencia de pesca, convirtiéndose en una herramienta integral para cualquier pescador.
+PescaPro es una aplicación móvil diseñada para los apasionados de la pesca. Su objetivo es facilitar el registro y la gestión de las capturas realizadas, permitiendo almacenar detalles como el nombre o título, descripción, peso y una imagen opcional de cada pieza capturada. Además, la app ofrece útiles consejos para mejorar la experiencia de pesca, convirtiéndose en una herramienta integral para cualquier pescador.
 
 ## Características
 
 - **Registro de Capturas:**  
   Permite añadir, editar y eliminar registros de capturas. Cada registro (o "tarjeta") incluye:
-    - Título (nombre de la captura)
-    - Descripción
-    - Peso (en kg)
-    - Imagen (opcional, se puede capturar con la cámara o seleccionar de la galería)
+  - **Título:** Representado por el campo `username` en el modelo, que almacena el nombre o título de la captura.
+  - **Descripción:** Almacenada en el campo `password` (aunque se recomienda renombrarlo en versiones futuras para mayor claridad).
+  - **Peso:** En kilogramos (campo `weight`).
+  - **Imagen:** Opcional, se puede capturar con la cámara o seleccionar de la galería. La imagen se almacena con la ruta en el campo `photoUri`.
+  - **Ubicación:** Si la imagen contiene datos EXIF, se extraen la latitud y longitud (campos `latitude` y `longitude`), lo que permite visualizar la ubicación de la captura en un mapa.
 
 - **Autenticación de Usuarios:**  
   Utiliza Firebase Authentication para gestionar el inicio de sesión y registro de usuarios, incluyendo la verificación de correo electrónico.
@@ -24,7 +25,7 @@ PescaPro es una aplicación móvil diseñada para los apasionados de la pesca. S
   Uso de un Navigation Drawer y navegación inferior para acceder fácilmente a las diferentes secciones de la aplicación.
 
 - **Selección y Captura de Imágenes:**  
-  Integración con la cámara y la galería del dispositivo, permitiendo seleccionar o capturar imágenes que se asocian a cada registro de captura.
+  Integración con la cámara y la galería del dispositivo, permitiendo seleccionar o capturar imágenes que se asocian a cada registro de captura. La configuración de rutas en el archivo XML permite el correcto acceso y almacenamiento de las imágenes.
 
 ## Tecnologías y Arquitectura
 
@@ -59,16 +60,16 @@ PescaPro es una aplicación móvil diseñada para los apasionados de la pesca. S
 1. **Clonar el Repositorio:**  
    Abre una terminal y ejecuta el siguiente comando:
    ```bash
-   git clone https://github.com/JuanraDAM/Kotlin2DAM/tree/mvvmYhitl
+   git clone https://github.com/JuanraDAM/Kotlin2DAM/tree/Version3.1Y3.2
    ```
 
 2. **Abrir en Android Studio:**  
    Importa el proyecto clonado en Android Studio.
 
 3. **Configurar Firebase:**
-- Crea un proyecto en Firebase.
-- Descarga el archivo `google-services.json` y colócalo en la carpeta `app` del proyecto.
-- Sincroniza el proyecto con Gradle para integrar correctamente las dependencias de Firebase.
+  - Crea un proyecto en Firebase.
+  - Descarga el archivo `google-services.json` y colócalo en la carpeta `app` del proyecto.
+  - Sincroniza el proyecto con Gradle para integrar correctamente las dependencias de Firebase.
 
 4. **Ejecutar la Aplicación:**  
    Compila y ejecuta la aplicación en un dispositivo físico o en un emulador Android.
@@ -80,14 +81,15 @@ PescaPro es una aplicación móvil diseñada para los apasionados de la pesca. S
 
 2. **Registro de Capturas:**  
    Una vez autenticado, el usuario puede:
-- Añadir nuevas capturas pulsando el botón flotante.
-- Completar el formulario para ingresar título, descripción, peso y seleccionar o capturar una imagen.
-- Editar o eliminar las capturas registradas a través de las opciones disponibles en cada tarjeta.
+  - Añadir nuevas capturas pulsando el botón flotante.
+  - Completar el formulario para ingresar título, descripción, peso y seleccionar o capturar una imagen.
+  - Editar o eliminar las capturas registradas a través de las opciones disponibles en cada tarjeta.
+  - Visualizar la ubicación extraída de la imagen (si se encuentra disponible) en un mapa.
 
 3. **Consejos de Pesca y Perfil:**  
    A través del menú lateral o inferior, el usuario podrá:
-- Acceder a una sección con consejos prácticos para la pesca.
-- Visualizar su perfil con información básica, como su correo electrónico.
+  - Acceder a una sección con consejos prácticos para la pesca.
+  - Visualizar su perfil con información básica, como su correo electrónico.
 
 ## Estructura del Proyecto
 
@@ -135,7 +137,7 @@ PescaPro/
 
 - **data:**  
   Implementa el acceso a datos y las fuentes de datos reales.
-  - **datasource:** Contiene clases para acceder a datos locales (ejemplo: `SharedPrefsDataSource.kt` para gestionar SharedPreferences).
+  - **datasource:** Contiene clases para acceder a datos locales (por ejemplo, `SharedPrefsDataSource.kt` para gestionar SharedPreferences).
   - **repository:** Implementa la interfaz de repositorio definida en la capa de dominio (`CardRepositoryImpl.kt`).
 
 - **di:**  
@@ -143,7 +145,7 @@ PescaPro/
 
 - **domain:**  
   Contiene el núcleo de la lógica de negocio.
-  - **models:** Define las entidades de dominio (por ejemplo, `Card.kt`).
+  - **models:** Define las entidades de dominio (por ejemplo, `Card.kt` con los campos actualizados).
   - **repository:** Declara las interfaces de los repositorios (por ejemplo, `CardRepository.kt`).
   - **usecase:** Encapsula los casos de uso que representan acciones de negocio (cargar, guardar o eliminar tarjetas).
 
@@ -154,5 +156,12 @@ PescaPro/
     - **activities:** Pantallas principales (por ejemplo, `LoginActivity.kt` y `ListActivity.kt`).
     - **adapters:** Adaptadores para listas y RecyclerViews (por ejemplo, `MyAdapter.kt` y `StaticTipsAdapter.kt`).
     - **fragments:** Fragmentos que componen la UI (por ejemplo, `CardDialogFragment.kt`, `FishingTipsFragment.kt` y `UserFragment.kt`).
+
+## Configuración Adicional
+
+- **Rutas de Archivos:**  
+  Se ha configurado un archivo XML (por ejemplo, `file_paths.xml`) para definir las rutas de acceso a imágenes, permitiendo el uso de imágenes guardadas en:
+  - El directorio público de imágenes (`Pictures/`).
+  - El directorio específico de la aplicación en el almacenamiento externo (`Android/data/com.example.proyectoevaluable/files/Pictures/`).
 
 ---
