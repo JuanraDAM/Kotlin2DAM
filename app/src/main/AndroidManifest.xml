@@ -4,6 +4,18 @@
     package="com.example.proyectoevaluable"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Queries para que se puedan detectar apps que manejen intents geo y https -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+
     <!-- Permisos necesarios -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -12,7 +24,7 @@
 
     <application
         android:name=".MyApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -22,7 +34,7 @@
         android:theme="@style/Theme.ProyectoEvaluable"
         tools:targetApi="31">
 
-        <!-- Proveedor de archivos para compartir imágenes -->
+        <!-- FileProvider para compartir imágenes -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -44,7 +56,6 @@
 
         <activity
             android:name=".ui.views.activities.ListActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false" />
     </application>
 </manifest>

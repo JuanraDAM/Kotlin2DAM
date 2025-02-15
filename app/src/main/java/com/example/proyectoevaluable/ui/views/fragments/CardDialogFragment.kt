@@ -33,7 +33,6 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 
-// Ahora el onSubmit recibe: title, description, weight, photoUri, latitude, longitude
 class CardDialogFragment(
     private val initialTitle: String? = null,
     private val initialDescription: String? = null,
@@ -58,13 +57,14 @@ class CardDialogFragment(
         val builder = AlertDialog.Builder(requireContext())
         rootView = LayoutInflater.from(context).inflate(R.layout.dialog_card, null)
 
+        // Referencias de los elementos del layout
         val titleEditText = rootView.findViewById<EditText>(R.id.titleEditText)
         val descriptionEditText = rootView.findViewById<EditText>(R.id.descriptionEditText)
         val weightEditText = rootView.findViewById<EditText>(R.id.weightEditText)
         val selectPhotoImageView = rootView.findViewById<ImageView>(R.id.selectPhotoImageView)
-        // Botón opcional para Maps (si lo incluyes en el layout dialog_card.xml)
         val mapsButton: Button? = rootView.findViewById(R.id.maps_button)
 
+        // Rellenar datos iniciales
         titleEditText.setText(initialTitle)
         descriptionEditText.setText(initialDescription)
         weightEditText.setText(initialWeight)
@@ -79,9 +79,7 @@ class CardDialogFragment(
 
         builder.setView(rootView)
             .setTitle(if (initialTitle == null) "Añadir Tarjeta" else "Editar Tarjeta")
-            .setNegativeButton("Cancelar") { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
             .setPositiveButton("Guardar", null)
 
         val dialog = builder.create()
@@ -135,7 +133,7 @@ class CardDialogFragment(
         if (cameraIntent.resolveActivity(requireActivity().packageManager) != null) {
             val photoFile = createImageFile()
             photoFile?.let { file ->
-                // Asegúrate de que file_paths.xml incluya una entrada para "Pictures/"
+                // Asegúrate de tener configurado file_paths.xml para "Pictures/"
                 photoUri = FileProvider.getUriForFile(requireContext(), "${requireActivity().packageName}.fileprovider", file)
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
                 startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
@@ -179,7 +177,8 @@ class CardDialogFragment(
                     photoUri?.let {
                         MediaScannerConnection.scanFile(requireContext(), arrayOf(currentPhotoPath), null, null)
                     }
-                    val bitmap = getScaledCorrectlyOrientedBitmap(currentPhotoPath, 600, 600)
+                    // Se aumenta la resolución para evitar compresión excesiva
+                    val bitmap = getScaledCorrectlyOrientedBitmap(currentPhotoPath, 1200, 1200)
                     val imageView = rootView.findViewById<ImageView>(R.id.selectPhotoImageView)
                     if (bitmap != null) {
                         imageView.setImageBitmap(bitmap)
@@ -214,7 +213,7 @@ class CardDialogFragment(
                     // Copia la imagen original al almacenamiento interno
                     val tempUri = saveImageToInternalStorage(selectedUri)
                     val filePath = tempUri?.path
-                    val bitmap = filePath?.let { getScaledCorrectlyOrientedBitmap(it, 600, 600) }
+                    val bitmap = filePath?.let { getScaledCorrectlyOrientedBitmap(it, 1200, 1200) }
                     val imageView = rootView.findViewById<ImageView>(R.id.selectPhotoImageView)
                     if (bitmap != null) {
                         imageView.setImageBitmap(bitmap)
@@ -232,32 +231,43 @@ class CardDialogFragment(
         }
     }
 
-    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
-        val (height, width) = options.run { outHeight to outWidth }
-        var inSampleSize = 1
-        if (height > reqHeight || width > reqWidth) {
-            val halfHeight = height / 2
-            val halfWidth = width / 2
-            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2
-            }
-            while ((width / inSampleSize) * (height / inSampleSize) > 720000) {
-                inSampleSize *= 2
-            }
-        }
-        return inSampleSize
-    }
-
-    private fun decodeSampledBitmapFromFile(filePath: String, reqWidth: Int, reqHeight: Int): Bitmap? {
+    /**
+     * Decodifica, escala manteniendo la relación de aspecto y corrige la orientación de la imagen.
+     * Se evita cargar imágenes demasiado grandes mediante el uso de inSampleSize.
+     */
+    private fun getScaledCorrectlyOrientedBitmap(filePath: String, maxWidth: Int, maxHeight: Int): Bitmap? {
+        // Obtiene las dimensiones originales sin cargar la imagen completa
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(filePath, options)
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
-        options.inJustDecodeBounds = false
-        return BitmapFactory.decodeFile(filePath, options)
-    }
+        val origWidth = options.outWidth
+        val origHeight = options.outHeight
+        if (origWidth <= 0 || origHeight <= 0) return null
 
-    private fun getScaledCorrectlyOrientedBitmap(filePath: String, reqWidth: Int, reqHeight: Int): Bitmap? {
-        val decodedBitmap = decodeSampledBitmapFromFile(filePath, reqWidth, reqHeight) ?: return null
+        // Calcula el factor de escala para mantener la relación de aspecto
+        val scaleFactor = minOf(maxWidth / origWidth.toFloat(), maxHeight / origHeight.toFloat())
+        val targetWidth = (origWidth * scaleFactor).toInt()
+        val targetHeight = (origHeight * scaleFactor).toInt()
+
+        // Calcula un inSampleSize adecuado
+        fun calculateSampleSize(): Int {
+            var inSampleSize = 1
+            if (origHeight > targetHeight || origWidth > targetWidth) {
+                val halfHeight = origHeight / 2
+                val halfWidth = origWidth / 2
+                while ((halfHeight / inSampleSize) >= targetHeight && (halfWidth / inSampleSize) >= targetWidth) {
+                    inSampleSize *= 2
+                }
+            }
+            return inSampleSize
+        }
+        options.apply {
+            inJustDecodeBounds = false
+            inSampleSize = calculateSampleSize()
+        }
+        val decodedBitmap = BitmapFactory.decodeFile(filePath, options) ?: return null
+        val scaledBitmap = Bitmap.createScaledBitmap(decodedBitmap, targetWidth, targetHeight, true)
+
+        // Corrige la orientación según EXIF
         val exif = ExifInterface(filePath)
         val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
         val rotationAngle = when (orientation) {
@@ -266,22 +276,24 @@ class CardDialogFragment(
             ExifInterface.ORIENTATION_ROTATE_270 -> 270f
             else -> 0f
         }
-        val scaledBitmap = Bitmap.createScaledBitmap(decodedBitmap, reqWidth, reqHeight, true)
         return if (rotationAngle != 0f) {
-            val matrix = Matrix()
-            matrix.postRotate(rotationAngle)
+            val matrix = Matrix().apply { postRotate(rotationAngle) }
             Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.width, scaledBitmap.height, matrix, true)
         } else {
             scaledBitmap
         }
     }
 
+    /**
+     * Guarda el bitmap escalado en el almacenamiento interno y devuelve su URI.
+     */
     private fun saveBitmapToInternalStorage(bitmap: Bitmap): Uri {
         val fileName = "image_scaled_${System.currentTimeMillis()}.jpg"
         val file = File(requireContext().filesDir, fileName)
         try {
             FileOutputStream(file).use { fos ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos)
+                // Puedes ajustar la calidad según tus necesidades (80, 90, 100, etc.)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
             }
         } catch (e: IOException) {
             Toast.makeText(requireContext(), "Error al guardar la imagen escalada: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -289,6 +301,9 @@ class CardDialogFragment(
         return Uri.fromFile(file)
     }
 
+    /**
+     * Copia la imagen seleccionada (por URI) al almacenamiento interno y devuelve su URI.
+     */
     private fun saveImageToInternalStorage(imageUri: Uri): Uri {
         val contentResolver = requireContext().contentResolver
         val fileName = "image_${System.currentTimeMillis()}.jpg"
@@ -310,23 +325,18 @@ class CardDialogFragment(
         return Uri.fromFile(file)
     }
 
+    //==============================================================================================
+    // Método preparado para convertir un Bitmap a Base64 (uso futuro)
+    //==============================================================================================
     private fun bitmapToBase64(bitmap: Bitmap): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
+        // Aquí se usa JPEG al 100% de calidad, ajusta según lo necesites
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    private fun openMapWithCoordinates(latitude: Double, longitude: Double) {
-        val geoUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=$latitude,$longitude")
-        val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
-        val chooser = Intent.createChooser(mapIntent, "Elige una aplicación de mapas")
-        if (chooser.resolveActivity(requireContext().packageManager) != null) {
-            startActivity(chooser)
-        } else {
-            Toast.makeText(requireContext(), "No se encontró una aplicación de mapas", Toast.LENGTH_SHORT).show()
-        }
-    }
+
 
     private fun openMapFromImage() {
         if (this::currentPhotoPath.isInitialized && currentPhotoPath.isNotEmpty()) {
@@ -345,6 +355,17 @@ class CardDialogFragment(
             }
         } else {
             Toast.makeText(requireContext(), "No hay imagen para extraer ubicación", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun openMapWithCoordinates(latitude: Double, longitude: Double) {
+        val geoUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=$latitude,$longitude")
+        val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
+        val chooser = Intent.createChooser(mapIntent, "Elige una aplicación de mapas")
+        if (chooser.resolveActivity(requireContext().packageManager) != null) {
+            startActivity(chooser)
+        } else {
+            Toast.makeText(requireContext(), "No se encontró una aplicación de mapas", Toast.LENGTH_SHORT).show()
         }
     }
 }

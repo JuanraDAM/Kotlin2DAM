@@ -1,6 +1,7 @@
 package com.example.proyectoevaluable.ui.views.activities
 
 import android.content.Intent
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -11,7 +12,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager

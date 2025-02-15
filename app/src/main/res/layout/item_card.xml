@@ -65,6 +65,14 @@
             android:src="@drawable/remove_ic"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Delete"/>
+
+        <ImageButton
+            android:id="@+id/maps_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Delete"
+            android:src="@drawable/ic_map" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

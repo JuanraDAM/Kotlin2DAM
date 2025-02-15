@@ -37,7 +37,6 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-
 }
 
 dependencies {
@@ -53,6 +52,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1")
     implementation("com.google.code.gson:gson:2.10.1")
+
+    // Dependencia para ExifInterface
+    implementation("androidx.exifinterface:exifinterface:1.3.6")
 
     // Hilt - Actualizado a la versión más reciente
     implementation("com.google.dagger:hilt-android:2.50")
