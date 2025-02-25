@@ -20,6 +20,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -33,18 +34,18 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 
+/**
+ * Ahora, en lugar de recibir la imagen como Uri, el callback recibe el String en base64.
+ */
 class CardDialogFragment(
     private val initialTitle: String? = null,
     private val initialDescription: String? = null,
     private val initialWeight: String? = null,
     private val initialPhotoUri: String? = null,
-    private val onSubmit: (String, String, String?, Uri?, Double?, Double?) -> Unit
+    private val onSubmit: (String, String, String?, String?, Double?, Double?) -> Unit
 ) : DialogFragment() {
 
     private var photoUri: Uri? = null
-    private val CAMERA_REQUEST_CODE = 100
-    private val GALLERY_REQUEST_CODE = 101
-    private val CAMERA_PERMISSION_CODE = 102
     private lateinit var currentPhotoPath: String
 
     // Variables para almacenar la ubicación extraída
@@ -53,18 +54,85 @@ class CardDialogFragment(
 
     private lateinit var rootView: View
 
+    // Registro de launchers mediante inicialización perezosa
+    private val cameraPermissionLauncher by lazy {
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                openCamera()
+            } else {
+                Toast.makeText(requireContext(), "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private val cameraActivityLauncher by lazy {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK) {
+                photoUri?.let {
+                    MediaScannerConnection.scanFile(requireContext(), arrayOf(currentPhotoPath), null, null)
+                }
+                val bitmap = getScaledCorrectlyOrientedBitmap(currentPhotoPath, 1200, 1200)
+                val imageView = rootView.findViewById<ImageView>(R.id.selectPhotoImageView)
+                if (bitmap != null) {
+                    imageView.setImageBitmap(bitmap)
+                    imageView.invalidate()
+                    photoUri = saveBitmapToInternalStorage(bitmap)
+                } else {
+                    Toast.makeText(requireContext(), "Error al procesar la imagen de la cámara", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private val galleryActivityLauncher by lazy {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
+                val selectedUri = result.data?.data
+                if (selectedUri == null) {
+                    Toast.makeText(requireContext(), "No se seleccionó ninguna imagen", Toast.LENGTH_SHORT).show()
+                    return@registerForActivityResult
+                }
+                var imageLatitude: Double? = null
+                var imageLongitude: Double? = null
+                try {
+                    requireContext().contentResolver.openInputStream(selectedUri)?.use { inputStream ->
+                        val exif = ExifInterface(inputStream)
+                        val latLong = FloatArray(2)
+                        if (exif.getLatLong(latLong)) {
+                            imageLatitude = latLong[0].toDouble()
+                            imageLongitude = latLong[1].toDouble()
+                        }
+                    }
+                } catch (e: IOException) {
+                    Toast.makeText(requireContext(), "Error al leer EXIF: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+                val tempUri = saveImageToInternalStorage(selectedUri)
+                val filePath = tempUri?.path
+                val bitmap = filePath?.let { getScaledCorrectlyOrientedBitmap(it, 1200, 1200) }
+                val imageView = rootView.findViewById<ImageView>(R.id.selectPhotoImageView)
+                if (bitmap != null) {
+                    imageView.setImageBitmap(bitmap)
+                    photoUri = saveBitmapToInternalStorage(bitmap)
+                    extractedLatitude = imageLatitude
+                    extractedLongitude = imageLongitude
+                } else {
+                    Toast.makeText(requireContext(), "Error al procesar la imagen de la galería", Toast.LENGTH_SHORT).show()
+                }
+                imageView.invalidate()
+            }
+        }
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(requireContext())
         rootView = LayoutInflater.from(context).inflate(R.layout.dialog_card, null)
 
-        // Referencias de los elementos del layout
         val titleEditText = rootView.findViewById<EditText>(R.id.titleEditText)
         val descriptionEditText = rootView.findViewById<EditText>(R.id.descriptionEditText)
         val weightEditText = rootView.findViewById<EditText>(R.id.weightEditText)
         val selectPhotoImageView = rootView.findViewById<ImageView>(R.id.selectPhotoImageView)
         val mapsButton: Button? = rootView.findViewById(R.id.maps_button)
 
-        // Rellenar datos iniciales
         titleEditText.setText(initialTitle)
         descriptionEditText.setText(initialDescription)
         weightEditText.setText(initialWeight)
@@ -90,11 +158,20 @@ class CardDialogFragment(
                 if (title.isEmpty()) {
                     Toast.makeText(requireContext(), "El título es obligatorio", Toast.LENGTH_SHORT).show()
                 } else {
+                    // Si existe una imagen, la convertimos a base64; de lo contrario, enviamos null.
+                    val base64Image: String? = photoUri?.let { uri ->
+                        try {
+                            val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
+                            bitmapToBase64(bitmap)
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
                     onSubmit(
                         title,
                         descriptionEditText.text.toString(),
                         weightEditText.text.toString(),
-                        photoUri,
+                        base64Image,
                         extractedLatitude,
                         extractedLongitude
                     )
@@ -124,7 +201,7 @@ class CardDialogFragment(
             == PackageManager.PERMISSION_GRANTED) {
             openCamera()
         } else {
-            requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE)
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
@@ -133,10 +210,13 @@ class CardDialogFragment(
         if (cameraIntent.resolveActivity(requireActivity().packageManager) != null) {
             val photoFile = createImageFile()
             photoFile?.let { file ->
-                // Asegúrate de tener configurado file_paths.xml para "Pictures/"
-                photoUri = FileProvider.getUriForFile(requireContext(), "${requireActivity().packageName}.fileprovider", file)
+                photoUri = FileProvider.getUriForFile(
+                    requireContext(),
+                    "${requireActivity().packageName}.fileprovider",
+                    file
+                )
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-                startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
+                cameraActivityLauncher.launch(cameraIntent)
             }
         }
     }
@@ -156,99 +236,20 @@ class CardDialogFragment(
 
     private fun openGallery() {
         val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE)
+        galleryActivityLauncher.launch(galleryIntent)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == CAMERA_PERMISSION_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera()
-            } else {
-                Toast.makeText(requireContext(), "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == AppCompatActivity.RESULT_OK) {
-            when (requestCode) {
-                CAMERA_REQUEST_CODE -> {
-                    photoUri?.let {
-                        MediaScannerConnection.scanFile(requireContext(), arrayOf(currentPhotoPath), null, null)
-                    }
-                    // Se aumenta la resolución para evitar compresión excesiva
-                    val bitmap = getScaledCorrectlyOrientedBitmap(currentPhotoPath, 1200, 1200)
-                    val imageView = rootView.findViewById<ImageView>(R.id.selectPhotoImageView)
-                    if (bitmap != null) {
-                        imageView.setImageBitmap(bitmap)
-                        imageView.invalidate()
-                        // Guarda la versión escalada y actualiza photoUri
-                        photoUri = saveBitmapToInternalStorage(bitmap)
-                    } else {
-                        Toast.makeText(requireContext(), "Error al procesar la imagen de la cámara", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                GALLERY_REQUEST_CODE -> {
-                    val selectedUri = data?.data
-                    if (selectedUri == null) {
-                        Toast.makeText(requireContext(), "No se seleccionó ninguna imagen", Toast.LENGTH_SHORT).show()
-                        return
-                    }
-                    // Extraer ubicación de la imagen original antes de copiarla
-                    var imageLatitude: Double? = null
-                    var imageLongitude: Double? = null
-                    try {
-                        requireContext().contentResolver.openInputStream(selectedUri)?.use { inputStream ->
-                            val exif = ExifInterface(inputStream)
-                            val latLong = FloatArray(2)
-                            if (exif.getLatLong(latLong)) {
-                                imageLatitude = latLong[0].toDouble()
-                                imageLongitude = latLong[1].toDouble()
-                            }
-                        }
-                    } catch (e: IOException) {
-                        Toast.makeText(requireContext(), "Error al leer EXIF: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-                    // Copia la imagen original al almacenamiento interno
-                    val tempUri = saveImageToInternalStorage(selectedUri)
-                    val filePath = tempUri?.path
-                    val bitmap = filePath?.let { getScaledCorrectlyOrientedBitmap(it, 1200, 1200) }
-                    val imageView = rootView.findViewById<ImageView>(R.id.selectPhotoImageView)
-                    if (bitmap != null) {
-                        imageView.setImageBitmap(bitmap)
-                        // Guarda la imagen escalada y actualiza photoUri
-                        photoUri = saveBitmapToInternalStorage(bitmap)
-                        // Conserva la ubicación extraída
-                        extractedLatitude = imageLatitude
-                        extractedLongitude = imageLongitude
-                    } else {
-                        Toast.makeText(requireContext(), "Error al procesar la imagen de la galería", Toast.LENGTH_SHORT).show()
-                    }
-                    imageView.invalidate()
-                }
-            }
-        }
-    }
-
-    /**
-     * Decodifica, escala manteniendo la relación de aspecto y corrige la orientación de la imagen.
-     * Se evita cargar imágenes demasiado grandes mediante el uso de inSampleSize.
-     */
     private fun getScaledCorrectlyOrientedBitmap(filePath: String, maxWidth: Int, maxHeight: Int): Bitmap? {
-        // Obtiene las dimensiones originales sin cargar la imagen completa
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(filePath, options)
         val origWidth = options.outWidth
         val origHeight = options.outHeight
         if (origWidth <= 0 || origHeight <= 0) return null
 
-        // Calcula el factor de escala para mantener la relación de aspecto
         val scaleFactor = minOf(maxWidth / origWidth.toFloat(), maxHeight / origHeight.toFloat())
         val targetWidth = (origWidth * scaleFactor).toInt()
         val targetHeight = (origHeight * scaleFactor).toInt()
 
-        // Calcula un inSampleSize adecuado
         fun calculateSampleSize(): Int {
             var inSampleSize = 1
             if (origHeight > targetHeight || origWidth > targetWidth) {
@@ -266,8 +267,6 @@ class CardDialogFragment(
         }
         val decodedBitmap = BitmapFactory.decodeFile(filePath, options) ?: return null
         val scaledBitmap = Bitmap.createScaledBitmap(decodedBitmap, targetWidth, targetHeight, true)
-
-        // Corrige la orientación según EXIF
         val exif = ExifInterface(filePath)
         val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
         val rotationAngle = when (orientation) {
@@ -284,15 +283,11 @@ class CardDialogFragment(
         }
     }
 
-    /**
-     * Guarda el bitmap escalado en el almacenamiento interno y devuelve su URI.
-     */
     private fun saveBitmapToInternalStorage(bitmap: Bitmap): Uri {
         val fileName = "image_scaled_${System.currentTimeMillis()}.jpg"
         val file = File(requireContext().filesDir, fileName)
         try {
             FileOutputStream(file).use { fos ->
-                // Puedes ajustar la calidad según tus necesidades (80, 90, 100, etc.)
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
             }
         } catch (e: IOException) {
@@ -301,9 +296,6 @@ class CardDialogFragment(
         return Uri.fromFile(file)
     }
 
-    /**
-     * Copia la imagen seleccionada (por URI) al almacenamiento interno y devuelve su URI.
-     */
     private fun saveImageToInternalStorage(imageUri: Uri): Uri {
         val contentResolver = requireContext().contentResolver
         val fileName = "image_${System.currentTimeMillis()}.jpg"
@@ -325,18 +317,15 @@ class CardDialogFragment(
         return Uri.fromFile(file)
     }
 
-    //==============================================================================================
-    // Método preparado para convertir un Bitmap a Base64 (uso futuro)
-    //==============================================================================================
+    /**
+     * Convierte un Bitmap a una cadena Base64.
+     */
     private fun bitmapToBase64(bitmap: Bitmap): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
-        // Aquí se usa JPEG al 100% de calidad, ajusta según lo necesites
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
-
-
 
     private fun openMapFromImage() {
         if (this::currentPhotoPath.isInitialized && currentPhotoPath.isNotEmpty()) {

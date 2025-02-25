@@ -2,7 +2,6 @@ package com.example.proyectoevaluable.data.cards.datasource
 
 import android.content.SharedPreferences
 import com.example.proyectoevaluable.domain.cards.models.Card
-import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import javax.inject.Inject
@@ -11,8 +10,9 @@ class SharedPrefsDataSource @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val gson: Gson
 ) {
+    // Se obtiene el UID del usuario desde SharedPreferences
     private val currentUserUid: String?
-        get() = FirebaseAuth.getInstance().currentUser?.uid
+        get() = sharedPreferences.getString("current_user_uid", null)
 
     fun saveCards(cards: List<Card>) {
         currentUserUid?.let { uid ->

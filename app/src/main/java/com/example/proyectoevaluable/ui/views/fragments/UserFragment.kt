@@ -8,9 +8,15 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.proyectoevaluable.R
-import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import com.example.proyectoevaluable.di.TokenManager
 
+@AndroidEntryPoint
 class UserFragment : Fragment() {
+
+    @Inject
+    lateinit var tokenManager: TokenManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,9 +28,10 @@ class UserFragment : Fragment() {
         val textViewUserInfo = view.findViewById<TextView>(R.id.textViewUserInfo)
         val buttonClose = view.findViewById<Button>(R.id.buttonClose)
 
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        textViewUserInfo.text = if (currentUser != null) {
-            "Bienvenido: ${currentUser.email}"
+        // Se obtiene el email del usuario desde TokenManager (almacenado tras login vía API)
+        val userEmail = tokenManager.getUserEmail()
+        textViewUserInfo.text = if (!userEmail.isNullOrEmpty()) {
+            "Bienvenido: $userEmail"
         } else {
             "No hay usuario logueado"
         }

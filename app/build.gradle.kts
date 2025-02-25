@@ -40,9 +40,9 @@ android {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-analytics")
+    //implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    //implementation("com.google.firebase:firebase-auth")
+    //implementation("com.google.firebase:firebase-analytics")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -63,7 +63,18 @@ dependencies {
     // Eliminadas dependencias obsoletas de Hilt
     implementation("androidx.activity:activity-ktx:1.7.2")
 
+    // Dependencias para Retrofit y OkHttp
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+
 }

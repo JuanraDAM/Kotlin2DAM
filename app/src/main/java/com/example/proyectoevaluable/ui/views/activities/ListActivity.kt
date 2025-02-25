@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -17,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyectoevaluable.R
+import com.example.proyectoevaluable.data.cards.datasource.SharedPrefsDataSource
 import com.example.proyectoevaluable.domain.cards.models.Card
 import com.example.proyectoevaluable.ui.viewmodel.cards.ListViewModel
 import com.example.proyectoevaluable.ui.views.activities.LoginActivity
@@ -26,9 +26,12 @@ import com.example.proyectoevaluable.ui.views.fragments.UserFragment
 import com.example.proyectoevaluable.ui.views.adapters.MyAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import javax.inject.Inject
+import com.example.proyectoevaluable.di.TokenManager
+import androidx.activity.viewModels
+
 
 @AndroidEntryPoint
 class ListActivity : AppCompatActivity() {
@@ -42,14 +45,16 @@ class ListActivity : AppCompatActivity() {
     private val viewModel: ListViewModel by viewModels()
     private val items = mutableListOf<Card>()
 
+    // Inyectamos el TokenManager para verificar la autenticación
+    @Inject
+    lateinit var tokenManager: TokenManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-        // No limpiamos la persistencia, para que las cards guardadas persistan
-
-        val firebaseUser = FirebaseAuth.getInstance().currentUser
-        if (firebaseUser == null) {
+        // Verificamos si hay token (indicador de usuario autenticado)
+        if (tokenManager.getToken().isNullOrEmpty()) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
@@ -78,7 +83,8 @@ class ListActivity : AppCompatActivity() {
                         .commit()
                 }
                 R.id.nav_logout -> {
-                    FirebaseAuth.getInstance().signOut()
+                    // Limpiamos el token en lugar de usar FirebaseAuth
+                    tokenManager.clearToken()
                     startActivity(Intent(this, LoginActivity::class.java))
                     finish()
                 }
@@ -126,7 +132,6 @@ class ListActivity : AppCompatActivity() {
                 showEditCardDialog(position)
             },
             onMapsClicked = { position ->
-                // Al pulsar el botón de Maps en la card, se utiliza la ubicación almacenada en la card.
                 openMapForCard(items[position])
             }
         )
@@ -147,7 +152,6 @@ class ListActivity : AppCompatActivity() {
             if (exif.getLatLong(latLong)) {
                 openMapWithCoordinates(latLong[0].toDouble(), latLong[1].toDouble())
             } else {
-                // Si en la card ya se habían extraído y guardado datos de ubicación, usarlos:
                 if (card.latitude != null && card.longitude != null) {
                     openMapWithCoordinates(card.latitude!!, card.longitude!!)
                 } else {
