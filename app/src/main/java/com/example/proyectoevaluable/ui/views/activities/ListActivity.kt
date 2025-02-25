@@ -13,6 +13,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyectoevaluable.R
@@ -24,14 +25,15 @@ import com.example.proyectoevaluable.ui.views.fragments.CardDialogFragment
 import com.example.proyectoevaluable.ui.views.fragments.FishingTipsFragment
 import com.example.proyectoevaluable.ui.views.fragments.UserFragment
 import com.example.proyectoevaluable.ui.views.adapters.MyAdapter
+import com.example.proyectoevaluable.di.TokenManager
+import com.example.proyectoevaluable.data.auth.AuthRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
-import com.example.proyectoevaluable.di.TokenManager
 import androidx.activity.viewModels
-
 
 @AndroidEntryPoint
 class ListActivity : AppCompatActivity() {
@@ -45,15 +47,15 @@ class ListActivity : AppCompatActivity() {
     private val viewModel: ListViewModel by viewModels()
     private val items = mutableListOf<Card>()
 
-    // Inyectamos el TokenManager para verificar la autenticación
-    @Inject
-    lateinit var tokenManager: TokenManager
+    // Inyección de AuthRepository y TokenManager con Hilt
+    @Inject lateinit var authRepository: AuthRepository
+    @Inject lateinit var tokenManager: TokenManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-        // Verificamos si hay token (indicador de usuario autenticado)
+        // Verificar si hay token (usuario autenticado)
         if (tokenManager.getToken().isNullOrEmpty()) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
@@ -83,10 +85,17 @@ class ListActivity : AppCompatActivity() {
                         .commit()
                 }
                 R.id.nav_logout -> {
-                    // Limpiamos el token en lugar de usar FirebaseAuth
-                    tokenManager.clearToken()
-                    startActivity(Intent(this, LoginActivity::class.java))
-                    finish()
+                    // Logout usando la API a través de AuthRepository
+                    lifecycleScope.launch {
+                        val result = authRepository.logout()
+                        result.onSuccess {
+                            Toast.makeText(this@ListActivity, "Sesión cerrada", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this@ListActivity, LoginActivity::class.java))
+                            finish()
+                        }.onFailure { e ->
+                            Toast.makeText(this@ListActivity, "Error al cerrar sesión: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
             drawerLayout.closeDrawer(GravityCompat.START)
@@ -144,7 +153,6 @@ class ListActivity : AppCompatActivity() {
             Toast.makeText(this, "No hay imagen para extraer ubicación", Toast.LENGTH_SHORT).show()
             return
         }
-        // Se asume que la URI es de un archivo guardado en almacenamiento interno.
         val file = File(Uri.parse(card.photoUri).path ?: "")
         try {
             val exif = ExifInterface(file.absolutePath)
