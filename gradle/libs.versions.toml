@@ -1,15 +1,16 @@
 [versions]
-agp = "8.5.0"                   # Mantén la versión del plugin de Gradle
+agp = "8.5.0"
 kotlin = "1.9.0"
-coreKtx = "1.12.0"              # Cambiado a una versión compatible
+coreKtx = "1.12.0"
 junit = "4.13.2"
-junitVersion = "1.1.5"          # Cambiado a una versión compatible
-espressoCore = "3.5.1"          # Cambiado a una versión compatible
-appcompat = "1.6.1"             # Cambiado a una versión compatible
-material = "1.8.0"              # Cambiado a una versión compatible
-activity = "1.6.1"              # Cambiado a una versión compatible
-constraintlayout = "2.1.4"      # Cambiado a una versión compatible
+junitVersion = "1.1.5"
+espressoCore = "3.5.1"
+appcompat = "1.6.1"
+material = "1.8.0"
+activity = "1.6.1"
+constraintlayout = "2.1.4"
 gson = "2.8.9"
+media3CommonKtx = "1.5.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -21,6 +22,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

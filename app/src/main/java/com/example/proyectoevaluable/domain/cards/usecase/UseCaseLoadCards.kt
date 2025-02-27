@@ -2,7 +2,10 @@ package com.example.proyectoevaluable.domain.cards.usecase
 
 import com.example.proyectoevaluable.domain.cards.models.Card
 import com.example.proyectoevaluable.domain.cards.repository.CardRepository
+import javax.inject.Inject
 
-class UseCaseLoadCards(private val repository: CardRepository) {
+class UseCaseLoadCards @Inject constructor(
+    private val repository: CardRepository
+) {
     suspend operator fun invoke(): List<Card> = repository.loadCards()
 }

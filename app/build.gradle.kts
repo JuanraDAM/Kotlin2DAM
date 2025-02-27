@@ -1,14 +1,16 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
     id("org.jetbrains.kotlin.kapt")
     id("com.google.gms.google-services")
     id("dagger.hilt.android.plugin")
 }
 
+
 android {
     namespace = "com.example.proyectoevaluable"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.proyectoevaluable"
@@ -58,6 +60,7 @@ dependencies {
 
     // Hilt - Actualizado a la versión más reciente
     implementation("com.google.dagger:hilt-android:2.50")
+    implementation(libs.androidx.media3.common.ktx)
     kapt("com.google.dagger:hilt-android-compiler:2.50")
 
     // Eliminadas dependencias obsoletas de Hilt
@@ -67,7 +70,6 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
-
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
 
@@ -75,6 +77,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
 }

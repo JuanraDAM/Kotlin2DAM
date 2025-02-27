@@ -42,7 +42,7 @@ class CardDialogFragment(
     private val initialDescription: String? = null,
     private val initialWeight: String? = null,
     private val initialPhotoUri: String? = null,
-    private val onSubmit: (String, String, String?, String?, Double?, Double?) -> Unit
+    private val onSubmit: (String, String, String, String, Double?, Double?) -> Unit
 ) : DialogFragment() {
 
     private var photoUri: Uri? = null
@@ -158,15 +158,15 @@ class CardDialogFragment(
                 if (title.isEmpty()) {
                     Toast.makeText(requireContext(), "El título es obligatorio", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Si existe una imagen, la convertimos a base64; de lo contrario, enviamos null.
-                    val base64Image: String? = photoUri?.let { uri ->
+                    // Se asegura que siempre se envíe un String para image:
+                    val base64Image: String = photoUri?.let { uri ->
                         try {
                             val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
                             bitmapToBase64(bitmap)
                         } catch (e: Exception) {
-                            null
+                            ""
                         }
-                    }
+                    } ?: ""
                     onSubmit(
                         title,
                         descriptionEditText.text.toString(),

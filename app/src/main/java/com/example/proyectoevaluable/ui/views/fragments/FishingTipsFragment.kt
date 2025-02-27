@@ -28,34 +28,44 @@ class FishingTipsFragment : Fragment() {
     private fun setUpRecyclerView() {
         val tips = listOf(
             Card(
-                username = "Consejo 1",
-                password = "Utiliza cebo fresco para atraer más peces.",
-                weight = "",
-                photoUri = null
+                id = null,
+                title = "Consejo 1",
+                description = "Utiliza cebo fresco para atraer más peces.",
+                weight = 0,
+                image = null,
+                userId = 0
             ),
             Card(
-                username = "Consejo 2",
-                password = "Los mejores momentos para pescar son al amanecer y al atardecer.",
-                weight = "",
-                photoUri = null
+                id = null,
+                title = "Consejo 2",
+                description = "Los mejores momentos para pescar son al amanecer y al atardecer.",
+                weight = 0,
+                image = null,
+                userId = 0
             ),
             Card(
-                username = "Consejo 3",
-                password = "Usa una caña de pescar adecuada para el tipo de pez que deseas capturar.",
-                weight = "",
-                photoUri = null
+                id = null,
+                title = "Consejo 3",
+                description = "Usa una caña de pescar adecuada para el tipo de pez que deseas capturar.",
+                weight = 0,
+                image = null,
+                userId = 0
             ),
             Card(
-                username = "Consejo 4",
-                password = "Lleva siempre un equipo de seguridad adecuado.",
-                weight = "",
-                photoUri = null
+                id = null,
+                title = "Consejo 4",
+                description = "Lleva siempre un equipo de seguridad adecuado.",
+                weight = 0,
+                image = null,
+                userId = 0
             ),
             Card(
-                username = "Consejo 5",
-                password = "Investiga sobre las condiciones del agua y el clima antes de salir.",
-                weight = "",
-                photoUri = null
+                id = null,
+                title = "Consejo 5",
+                description = "Investiga sobre las condiciones del agua y el clima antes de salir.",
+                weight = 0,
+                image = null,
+                userId = 0
             )
         )
 

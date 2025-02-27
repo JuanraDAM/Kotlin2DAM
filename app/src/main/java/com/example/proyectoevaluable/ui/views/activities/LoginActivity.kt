@@ -32,7 +32,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Verifica si ya hay un token almacenado (usuario autenticado)
+        // Si ya hay token, redirige a ListActivity
         tokenManager.getToken()?.let {
             startActivity(Intent(this, ListActivity::class.java))
             finish()
@@ -64,7 +64,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        // Configura el enlace de recuperar contraseña
+        // Configurar el enlace para recuperar contraseña
         val content = SpannableString("Recuperar contraseña")
         content.setSpan(UnderlineSpan(), 0, content.length, 0)
         recoverPasswordText.text = content
@@ -73,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
             if (email.isEmpty()) {
                 Toast.makeText(this, "Introduce un correo electrónico", Toast.LENGTH_SHORT).show()
             } else {
-                // Llama al diálogo de recuperación (sin requerir token)
+                // Muestra el diálogo de recuperación sin requerir token
                 val dialog = RecoverPasswordDialogFragment.newInstance(email)
                 dialog.show(supportFragmentManager, "RecoverPasswordDialogFragment")
             }

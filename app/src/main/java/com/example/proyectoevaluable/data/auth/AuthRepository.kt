@@ -5,6 +5,7 @@ import com.example.proyectoevaluable.di.TokenManager
 import com.example.proyectoevaluable.domain.auth.AuthResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import android.util.Log
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,18 +18,21 @@ class AuthRepository @Inject constructor(
     suspend fun login(email: String, password: String): Result<String> = withContext(Dispatchers.IO) {
         try {
             val response = remoteDataSource.login(email, password)
+            Log.d("AuthRepository", "Login response code: ${response.code()}")
+            Log.d("AuthRepository", "Login response body: ${response.body()}")
             if (response.isSuccessful) {
                 response.body()?.let { authResponse: AuthResponse ->
                     tokenManager.saveToken(authResponse.token)
                     tokenManager.saveUserEmail(email)
                     tokenManager.saveUserId(authResponse.userId)
-
+                    Log.d("AuthRepository", "Token guardado: ${authResponse.token}")
                     Result.success(authResponse.token)
                 } ?: Result.failure(Exception("Respuesta vacía"))
             } else {
                 Result.failure(Exception("Error en login: ${response.code()}"))
             }
         } catch (e: Exception) {
+            Log.e("AuthRepository", "Error en login", e)
             Result.failure(e)
         }
     }
@@ -75,5 +79,4 @@ class AuthRepository @Inject constructor(
             Result.failure(e)
         }
     }
-
 }

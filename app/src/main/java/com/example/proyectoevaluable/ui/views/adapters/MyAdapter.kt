@@ -19,31 +19,33 @@ class MyAdapter(
     private val items: MutableList<Card>,
     private val onDeleteConfirmed: (Int) -> Unit,
     private val onEditClicked: (Int) -> Unit,
-    private val onMapsClicked: (Int) -> Unit  // Callback para el botón de maps
+    private val onMapsClicked: (Int) -> Unit
 ) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_card, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_card, parent, false)
         return MyViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val card = items[position]
 
-        holder.titleTextView.text = card.username
-        holder.descriptionTextView.text = card.password
+        // Usamos 'title' y 'description' en lugar de 'username' y 'password'
+        holder.titleTextView.text = card.title
+        holder.descriptionTextView.text = card.description
 
-        val weightInKg = card.weight?.let { "$it kg" } ?: "-- kg"
+        val weightInKg = "${card.weight} kg"
         holder.weightTextView.text = "Peso: $weightInKg"
 
-        if (!card.photoUri.isNullOrEmpty()) {
-            holder.imageView.setImageURI(Uri.parse(card.photoUri))
+        if (!card.image.isNullOrEmpty()) {
+            holder.imageView.setImageURI(Uri.parse(card.image))
         } else {
             holder.imageView.setImageResource(R.drawable.logo)
         }
 
         holder.imageView.setOnClickListener {
-            showImageDialog(card.photoUri)
+            showImageDialog(card.image)
         }
 
         holder.editButton.setOnClickListener {
@@ -59,21 +61,21 @@ class MyAdapter(
                 .show()
         }
 
-        // Callback para el botón de maps
         holder.mapsButton.setOnClickListener {
             onMapsClicked(position)
         }
     }
 
-    private fun showImageDialog(photoUri: String?) {
-        if (photoUri.isNullOrEmpty()) {
+    private fun showImageDialog(image: String?) {
+        if (image.isNullOrEmpty()) {
             Toast.makeText(context, "No hay imagen para mostrar", Toast.LENGTH_SHORT).show()
             return
         }
         val dialog = AlertDialog.Builder(context).create()
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_image, null)
+        val dialogView = LayoutInflater.from(context)
+            .inflate(R.layout.dialog_image, null)
         val imageView = dialogView.findViewById<ImageView>(R.id.dialog_image_view)
-        imageView.setImageURI(Uri.parse(photoUri))
+        imageView.setImageURI(Uri.parse(image))
         dialog.setView(dialogView)
         dialog.setCanceledOnTouchOutside(true)
         dialog.window?.setLayout(
@@ -92,7 +94,6 @@ class MyAdapter(
         val weightTextView: TextView = itemView.findViewById(R.id.item_weight)
         val editButton: ImageButton = itemView.findViewById(R.id.edit_button)
         val deleteButton: ImageButton = itemView.findViewById(R.id.delete_button)
-        // Referencia al botón de maps
         val mapsButton: ImageButton = itemView.findViewById(R.id.maps_button)
     }
 }

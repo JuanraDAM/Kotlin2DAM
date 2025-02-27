@@ -15,21 +15,24 @@ class StaticTipsAdapter(
 ) : RecyclerView.Adapter<StaticTipsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_static_card, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_static_card, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val card = items[position]
 
-        holder.titleTextView.text = card.username
-        holder.descriptionTextView.text = card.password
+        // Se utilizan los campos actualizados del modelo Card
+        holder.titleTextView.text = card.title
+        holder.descriptionTextView.text = card.description
 
-        val weightText = card.weight?.let { "$it kg" } ?: "-- kg"
+        // Asumimos que weight es Int, por lo que lo convertimos a String
+        val weightText = "${card.weight} kg"
         holder.weightTextView.text = "Peso: $weightText"
 
-        if (!card.photoUri.isNullOrEmpty()) {
-            holder.imageView.setImageURI(Uri.parse(card.photoUri))
+        if (!card.image.isNullOrEmpty()) {
+            holder.imageView.setImageURI(Uri.parse(card.image))
         } else {
             holder.imageView.setImageResource(R.drawable.logo)
         }

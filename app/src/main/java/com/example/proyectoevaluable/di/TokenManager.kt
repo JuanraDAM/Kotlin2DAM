@@ -9,36 +9,33 @@ import javax.inject.Singleton
 @Singleton
 class TokenManager @Inject constructor(@ApplicationContext context: Context) {
     private val prefs: SharedPreferences =
-        context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
-
-    companion object {
-        private const val TOKEN_KEY = "TOKEN_KEY"
-        private const val USER_EMAIL_KEY = "current_user_email"
-        private const val USER_ID_KEY = "current_user_id"
-    }
+        context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+    private val TOKEN_KEY = "auth_token"
+    private val USER_EMAIL_KEY = "user_email"
+    private val USER_ID_KEY = "user_id"
 
     fun saveToken(token: String) {
         prefs.edit().putString(TOKEN_KEY, token).apply()
     }
 
-    fun getToken(): String? = prefs.getString(TOKEN_KEY, null)
+    fun getToken(): String? {
+        return prefs.getString(TOKEN_KEY, null)
+    }
 
     fun clearToken() {
         prefs.edit().remove(TOKEN_KEY).apply()
-        prefs.edit().remove(USER_EMAIL_KEY).apply()
-        prefs.edit().remove(USER_ID_KEY).apply()
     }
 
-    // Métodos para el email del usuario
     fun saveUserEmail(email: String) {
         prefs.edit().putString(USER_EMAIL_KEY, email).apply()
     }
 
-    fun getUserEmail(): String? = prefs.getString(USER_EMAIL_KEY, null)
+    fun getUserEmail(): String? {
+        return prefs.getString(USER_EMAIL_KEY, null)
+    }
 
-    // Métodos para el ID del usuario
-    fun saveUserId(id: Int) {
-        prefs.edit().putInt(USER_ID_KEY, id).apply()
+    fun saveUserId(userId: Int) {
+        prefs.edit().putInt(USER_ID_KEY, userId).apply()
     }
 
     fun getUserId(): Int? {

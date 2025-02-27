@@ -13,11 +13,9 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyectoevaluable.R
-import com.example.proyectoevaluable.data.cards.datasource.SharedPrefsDataSource
 import com.example.proyectoevaluable.domain.cards.models.Card
 import com.example.proyectoevaluable.ui.viewmodel.cards.ListViewModel
 import com.example.proyectoevaluable.ui.views.activities.LoginActivity
@@ -30,10 +28,11 @@ import com.example.proyectoevaluable.data.auth.AuthRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
-import androidx.activity.viewModels
 
 @AndroidEntryPoint
 class ListActivity : AppCompatActivity() {
@@ -47,7 +46,7 @@ class ListActivity : AppCompatActivity() {
     private val viewModel: ListViewModel by viewModels()
     private val items = mutableListOf<Card>()
 
-    // Inyección de AuthRepository y TokenManager con Hilt
+    // Inyectamos AuthRepository y TokenManager
     @Inject lateinit var authRepository: AuthRepository
     @Inject lateinit var tokenManager: TokenManager
 
@@ -55,7 +54,6 @@ class ListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-        // Verificar si hay token (usuario autenticado)
         if (tokenManager.getToken().isNullOrEmpty()) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
@@ -85,7 +83,6 @@ class ListActivity : AppCompatActivity() {
                         .commit()
                 }
                 R.id.nav_logout -> {
-                    // Logout usando la API a través de AuthRepository
                     lifecycleScope.launch {
                         val result = authRepository.logout()
                         result.onSuccess {
@@ -105,7 +102,6 @@ class ListActivity : AppCompatActivity() {
         menuButton.setOnClickListener { drawerLayout.openDrawer(GravityCompat.START) }
         addButton.setOnClickListener { showAddCardDialog() }
 
-        // Botones de navegación inferior
         findViewById<ImageView>(R.id.nav_profile).setOnClickListener { showUserFragment() }
         findViewById<ImageView>(R.id.nav_home).setOnClickListener {
             supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
@@ -149,11 +145,11 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun openMapForCard(card: Card) {
-        if (card.photoUri.isNullOrEmpty()) {
+        if (card.image.isNullOrEmpty()) {
             Toast.makeText(this, "No hay imagen para extraer ubicación", Toast.LENGTH_SHORT).show()
             return
         }
-        val file = File(Uri.parse(card.photoUri).path ?: "")
+        val file = File(Uri.parse(card.image).path ?: "")
         try {
             val exif = ExifInterface(file.absolutePath)
             val latLong = FloatArray(2)
@@ -182,38 +178,43 @@ class ListActivity : AppCompatActivity() {
         }
     }
 
+    // Método para crear una card usando la API (estructura basada en item)
     private fun showAddCardDialog() {
-        val dialog = CardDialogFragment { title, description, weight, photoUri, lat, lon ->
+        val dialog = CardDialogFragment { title, description, weight, base64Image, lat, lon ->
             val card = Card(
-                username = title,
-                password = description,
-                weight = weight,
-                photoUri = photoUri?.toString(),
+                id = null, // El servidor asignará el ID
+                title = title,
+                description = description,
+                weight = weight?.toIntOrNull() ?: 0,
+                image = base64Image,
                 latitude = lat,
-                longitude = lon
+                longitude = lon,
+                userId = tokenManager.getUserId() ?: 0
             )
-            val newList = items.toMutableList().apply { add(card) }
-            viewModel.saveCards(newList)
+            viewModel.saveCard(card)
         }
         dialog.show(supportFragmentManager, "AddCardDialog")
     }
 
+    // Método para editar una card usando la API
     private fun showEditCardDialog(position: Int) {
         val card = items[position]
         val dialog = CardDialogFragment(
-            initialTitle = card.username,
-            initialDescription = card.password,
-            initialWeight = card.weight,
-            initialPhotoUri = card.photoUri
-        ) { title, description, weight, photoUri, lat, lon ->
-            card.username = title
-            card.password = description
-            card.weight = weight
-            card.photoUri = photoUri?.toString()
-            card.latitude = lat
-            card.longitude = lon
+            initialTitle = card.title,
+            initialDescription = card.description,
+            initialWeight = card.weight.toString(),
+            initialPhotoUri = card.image
+        ) { title, description, weight, base64Image, lat, lon ->
+            val updatedCard = card.copy(
+                title = title,
+                description = description,
+                weight = weight?.toIntOrNull() ?: card.weight,
+                image = base64Image,
+                latitude = lat,
+                longitude = lon
+            )
+            viewModel.updateCard(updatedCard)
             adapter?.notifyItemChanged(position)
-            viewModel.saveCards(items.toMutableList())
         }
         dialog.show(supportFragmentManager, "EditCardDialog")
     }
