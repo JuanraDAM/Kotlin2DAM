@@ -1,4 +1,4 @@
-package com.example.domain.models
+package com.example.proyectoevaluable.domain.cards.models
 
 import kotlinx.serialization.Serializable
 
@@ -9,5 +9,7 @@ data class Item(
     val description: String? = null,
     val weight: Int,
     val image: String,
-    val userId: Int
+    val userId: Int,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )

@@ -16,6 +16,7 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -40,15 +41,18 @@ class CardDialogFragment(
     private val initialTitle: String? = null,
     private val initialDescription: String? = null,
     private val initialWeight: String? = null,
-    // Para el caso de edición, si ya existe una imagen, se espera que sea un string Base64
+    // En modo edición, la imagen viene como Base64
     private val initialPhotoUri: String? = null,
+    // Nuevos parámetros: coordenadas iniciales (si existen) de la card
+    private val initialLatitude: Double? = null,
+    private val initialLongitude: Double? = null,
     private val onSubmit: (String, String, String, String, Double?, Double?) -> Unit
 ) : DialogFragment() {
 
     private var photoUri: Uri? = null
     private lateinit var currentPhotoPath: String
 
-    // Variables para almacenar la ubicación extraída
+    // Variables para almacenar la ubicación extraída (o las iniciales en modo edición)
     private var extractedLatitude: Double? = null
     private var extractedLongitude: Double? = null
 
@@ -100,6 +104,7 @@ class CardDialogFragment(
                         if (exif.getLatLong(latLong)) {
                             imageLatitude = latLong[0].toDouble()
                             imageLongitude = latLong[1].toDouble()
+                            Log.d("CardDialogFragment", "EXIF (galería): lat=$imageLatitude, lon=$imageLongitude")
                         }
                     }
                 } catch (e: IOException) {
@@ -112,8 +117,10 @@ class CardDialogFragment(
                 if (bitmap != null) {
                     imageView.setImageBitmap(bitmap)
                     photoUri = saveBitmapToInternalStorage(bitmap)
+                    // Asignamos las coordenadas extraídas de la imagen de la galería
                     extractedLatitude = imageLatitude
                     extractedLongitude = imageLongitude
+                    Log.d("CardDialogFragment", "Coordenadas asignadas: lat=$extractedLatitude, lon=$extractedLongitude")
                 } else {
                     Toast.makeText(requireContext(), "Error al procesar la imagen de la galería", Toast.LENGTH_SHORT).show()
                 }
@@ -136,16 +143,19 @@ class CardDialogFragment(
         descriptionEditText.setText(initialDescription)
         weightEditText.setText(initialWeight)
 
-        // Si existe una imagen inicial, la decodificamos desde Base64 y la mostramos
+        // Modo edición: si existe una imagen inicial, se decodifica desde Base64 y se muestra.
+        // Además, se asignan las coordenadas iniciales que vienen con la card.
         if (!initialPhotoUri.isNullOrEmpty()) {
             val bitmap = decodeBase64ToBitmap(initialPhotoUri)
             if (bitmap != null) {
                 selectPhotoImageView.setImageBitmap(bitmap)
-                // Opcional: guardar el bitmap en almacenamiento interno para futuras referencias
                 photoUri = saveBitmapToInternalStorage(bitmap)
             } else {
                 selectPhotoImageView.setImageResource(R.drawable.logo)
             }
+            extractedLatitude = initialLatitude
+            extractedLongitude = initialLongitude
+            Log.d("CardDialogFragment", "Imagen editada: usando coordenadas iniciales: lat=$extractedLatitude, lon=$extractedLongitude")
         }
 
         selectPhotoImageView.setOnClickListener { showImagePickerOptions() }
@@ -173,6 +183,8 @@ class CardDialogFragment(
                             ""
                         }
                     } ?: ""
+                    // Agregar log para confirmar las coordenadas antes de enviar
+                    Log.d("CardDialogFragment", "Envío onSubmit con coordenadas: lat=$extractedLatitude, lon=$extractedLongitude")
                     onSubmit(
                         title,
                         descriptionEditText.text.toString(),
@@ -344,24 +356,12 @@ class CardDialogFragment(
         }
     }
 
-
     private fun openMapFromImage() {
-        if (this::currentPhotoPath.isInitialized && currentPhotoPath.isNotEmpty()) {
-            try {
-                val exif = ExifInterface(currentPhotoPath)
-                val latLong = FloatArray(2)
-                if (exif.getLatLong(latLong)) {
-                    val latitude = latLong[0].toDouble()
-                    val longitude = latLong[1].toDouble()
-                    openMapWithCoordinates(latitude, longitude)
-                } else {
-                    Toast.makeText(requireContext(), "La imagen no contiene datos de ubicación", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error al obtener ubicación: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        // Usamos las coordenadas almacenadas (extraídas o iniciales) para abrir el mapa.
+        if (extractedLatitude != null && extractedLongitude != null) {
+            openMapWithCoordinates(extractedLatitude!!, extractedLongitude!!)
         } else {
-            Toast.makeText(requireContext(), "No hay imagen para extraer ubicación", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "No se encontraron coordenadas en la imagen", Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -1,4 +1,4 @@
-package com.example.proyectoevaluable.domain.cards.requests
+package com.example.domain.Cards
 
 import kotlinx.serialization.Serializable
 
@@ -8,5 +8,8 @@ data class CreateItemRequest(
     val description: String? = null,
     val weight: Int,
     val image: String,  // La imagen se recibirá como cadena Base64
-    val userId: Int
+    val userId: Int,
+    // Nuevos campos para ubicación:
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )

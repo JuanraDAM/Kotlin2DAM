@@ -32,14 +32,12 @@ class MyAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val card = items[position]
-
         holder.titleTextView.text = card.title
         holder.descriptionTextView.text = card.description
 
         val weightInKg = "${card.weight} kg"
         holder.weightTextView.text = "Peso: $weightInKg"
 
-        // Si hay imagen en Base64, se decodifica; de lo contrario, se muestra un placeholder
         if (!card.image.isNullOrEmpty()) {
             val bitmap = decodeBase64ToBitmap(card.image)
             if (bitmap != null) {
@@ -51,7 +49,6 @@ class MyAdapter(
             holder.imageView.setImageResource(R.drawable.logo)
         }
 
-        // Al pulsar sobre la imagen, se muestra en un diálogo
         holder.imageView.setOnClickListener {
             showImageDialog(card.image)
         }
@@ -74,9 +71,6 @@ class MyAdapter(
         }
     }
 
-    /**
-     * Decodifica una cadena Base64 en un Bitmap usando el flag NO_WRAP para evitar saltos de línea.
-     */
     fun decodeBase64ToBitmap(base64Str: String): Bitmap? {
         return try {
             val decodedBytes = Base64.decode(base64Str, Base64.NO_WRAP)
@@ -87,9 +81,6 @@ class MyAdapter(
         }
     }
 
-    /**
-     * Muestra un diálogo con la imagen decodificada.
-     */
     private fun showImageDialog(image: String?) {
         if (image.isNullOrEmpty()) {
             Toast.makeText(context, "No hay imagen para mostrar", Toast.LENGTH_SHORT).show()

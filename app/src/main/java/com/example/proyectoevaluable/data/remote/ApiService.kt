@@ -1,16 +1,16 @@
 package com.example.proyectoevaluable.data.remote
 
-import com.example.domain.models.Item
+import com.example.domain.Cards.CreateItemRequest
 import com.example.proyectoevaluable.domain.auth.AuthResponse
 import com.example.proyectoevaluable.domain.auth.LoginRequest
 import com.example.proyectoevaluable.domain.auth.RegisterRequest
 import com.example.proyectoevaluable.domain.auth.RecoverPasswordRequest
 import com.example.proyectoevaluable.domain.auth.UpdateUserRequest
 import com.example.proyectoevaluable.domain.cards.models.Card
-import com.example.proyectoevaluable.domain.cards.requests.CreateItemRequest
+import com.example.proyectoevaluable.domain.cards.models.Item
 import com.example.proyectoevaluable.domain.cards.requests.CreateItemResponse
 import com.example.proyectoevaluable.domain.cards.requests.ItemsResponse
-import com.example.proyectoevaluable.domain.cards.requests.UpdateItemRequest as CardUpdateItemRequest
+import com.example.domain.Cards.UpdateItemRequest as CardUpdateItemRequest
 import retrofit2.Response
 import retrofit2.http.*
 
