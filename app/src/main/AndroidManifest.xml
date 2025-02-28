@@ -4,7 +4,7 @@
     package="com.example.proyectoevaluable"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Queries para que se puedan detectar apps que manejen intents geo y https -->
+    <!-- Queries y permisos existentes -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -16,7 +16,6 @@
         </intent>
     </queries>
 
-    <!-- Permisos necesarios -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -36,7 +35,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <!-- FileProvider para compartir imágenes -->
+        <!-- FileProvider para compartir archivos -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -47,14 +46,20 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <!-- SplashActivity como launcher -->
         <activity
-            android:name=".ui.views.activities.LoginActivity"
-            android:exported="true">
+            android:name=".ui.views.activities.SplashActivity"
+            android:exported="true"
+            android:hardwareAccelerated="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.views.activities.LoginActivity"
+            android:exported="true" />
 
         <activity
             android:name=".ui.views.activities.ListActivity"
