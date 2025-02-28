@@ -41,9 +41,9 @@ class CardDialogFragment(
     private val initialTitle: String? = null,
     private val initialDescription: String? = null,
     private val initialWeight: String? = null,
-    // En modo edición, la imagen viene como Base64
+    // Para el modo edición, la imagen viene en Base64
     private val initialPhotoUri: String? = null,
-    // Nuevos parámetros: coordenadas iniciales (si existen) de la card
+    // NUEVOS parámetros: coordenadas que se hayan almacenado previamente en la card
     private val initialLatitude: Double? = null,
     private val initialLongitude: Double? = null,
     private val onSubmit: (String, String, String, String, Double?, Double?) -> Unit
@@ -52,13 +52,12 @@ class CardDialogFragment(
     private var photoUri: Uri? = null
     private lateinit var currentPhotoPath: String
 
-    // Variables para almacenar la ubicación extraída (o las iniciales en modo edición)
+    // Variables para almacenar las coordenadas extraídas o iniciales
     private var extractedLatitude: Double? = null
     private var extractedLongitude: Double? = null
 
     private lateinit var rootView: View
 
-    // Inicializamos los launchers en onAttach (antes de que el fragmento se cree completamente)
     private lateinit var cameraPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var cameraActivityLauncher: ActivityResultLauncher<Intent>
     private lateinit var galleryActivityLauncher: ActivityResultLauncher<Intent>
@@ -117,7 +116,6 @@ class CardDialogFragment(
                 if (bitmap != null) {
                     imageView.setImageBitmap(bitmap)
                     photoUri = saveBitmapToInternalStorage(bitmap)
-                    // Asignamos las coordenadas extraídas de la imagen de la galería
                     extractedLatitude = imageLatitude
                     extractedLongitude = imageLongitude
                     Log.d("CardDialogFragment", "Coordenadas asignadas: lat=$extractedLatitude, lon=$extractedLongitude")
@@ -143,8 +141,7 @@ class CardDialogFragment(
         descriptionEditText.setText(initialDescription)
         weightEditText.setText(initialWeight)
 
-        // Modo edición: si existe una imagen inicial, se decodifica desde Base64 y se muestra.
-        // Además, se asignan las coordenadas iniciales que vienen con la card.
+        // Si hay imagen inicial (modo edición), decodificarla y asignar sus coordenadas
         if (!initialPhotoUri.isNullOrEmpty()) {
             val bitmap = decodeBase64ToBitmap(initialPhotoUri)
             if (bitmap != null) {
@@ -153,13 +150,17 @@ class CardDialogFragment(
             } else {
                 selectPhotoImageView.setImageResource(R.drawable.logo)
             }
+            // Asignamos las coordenadas iniciales
             extractedLatitude = initialLatitude
             extractedLongitude = initialLongitude
             Log.d("CardDialogFragment", "Imagen editada: usando coordenadas iniciales: lat=$extractedLatitude, lon=$extractedLongitude")
         }
 
         selectPhotoImageView.setOnClickListener { showImagePickerOptions() }
-        mapsButton?.setOnClickListener { openMapFromImage() }
+        mapsButton?.setOnClickListener {
+            Log.d("CardDialogFragment", "Maps button clicked")
+            openMapFromImage()
+        }
 
         builder.setView(rootView)
             .setTitle(if (initialTitle == null) "Añadir Tarjeta" else "Editar Tarjeta")
@@ -174,7 +175,6 @@ class CardDialogFragment(
                 if (title.isEmpty()) {
                     Toast.makeText(requireContext(), "El título es obligatorio", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Se asegura que siempre se envíe un String para image (Base64 o vacío)
                     val base64Image: String = photoUri?.let { uri ->
                         try {
                             val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
@@ -183,7 +183,6 @@ class CardDialogFragment(
                             ""
                         }
                     } ?: ""
-                    // Agregar log para confirmar las coordenadas antes de enviar
                     Log.d("CardDialogFragment", "Envío onSubmit con coordenadas: lat=$extractedLatitude, lon=$extractedLongitude")
                     onSubmit(
                         title,
@@ -357,7 +356,7 @@ class CardDialogFragment(
     }
 
     private fun openMapFromImage() {
-        // Usamos las coordenadas almacenadas (extraídas o iniciales) para abrir el mapa.
+        Log.d("CardDialogFragment", "openMapFromImage called. extractedLatitude: $extractedLatitude, extractedLongitude: $extractedLongitude")
         if (extractedLatitude != null && extractedLongitude != null) {
             openMapWithCoordinates(extractedLatitude!!, extractedLongitude!!)
         } else {

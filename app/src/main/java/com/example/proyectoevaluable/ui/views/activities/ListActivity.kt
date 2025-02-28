@@ -71,9 +71,7 @@ class ListActivity : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile -> showUserFragment()
-                R.id.nav_main_list -> {
-                    supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                }
+                R.id.nav_main_list -> supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 R.id.nav_second_list -> {
                     val container = findViewById<FrameLayout>(R.id.fragmentContainer)
                     container.visibility = View.VISIBLE
@@ -135,50 +133,13 @@ class ListActivity : AppCompatActivity() {
             },
             onEditClicked = { position ->
                 showEditCardDialog(position)
-            },
-            onMapsClicked = { position ->
-                openMapForCard(items[position])
             }
+            // Se elimina el parámetro "onMapsClicked" ya que la funcionalidad se implementa directamente en el adapter.
         )
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
     }
 
-    private fun openMapForCard(card: Card) {
-        if (card.image.isNullOrEmpty()) {
-            Toast.makeText(this, "No hay imagen para extraer ubicación", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val file = File(Uri.parse(card.image).path ?: "")
-        try {
-            val exif = ExifInterface(file.absolutePath)
-            val latLong = FloatArray(2)
-            if (exif.getLatLong(latLong)) {
-                openMapWithCoordinates(latLong[0].toDouble(), latLong[1].toDouble())
-            } else {
-                if (card.latitude != null && card.longitude != null) {
-                    openMapWithCoordinates(card.latitude!!, card.longitude!!)
-                } else {
-                    Toast.makeText(this, "La imagen no contiene datos de ubicación", Toast.LENGTH_SHORT).show()
-                }
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error al obtener ubicación: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun openMapWithCoordinates(latitude: Double, longitude: Double) {
-        val geoUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=$latitude,$longitude")
-        val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
-        val chooser = Intent.createChooser(mapIntent, "Elige una aplicación de mapas")
-        if (chooser.resolveActivity(packageManager) != null) {
-            startActivity(chooser)
-        } else {
-            Toast.makeText(this, "No se encontró una aplicación de mapas", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    // Método para crear una card usando la API (estructura basada en item)
     private fun showAddCardDialog() {
         val dialog = CardDialogFragment { title, description, weight, base64Image, lat, lon ->
             val card = Card(
@@ -196,14 +157,15 @@ class ListActivity : AppCompatActivity() {
         dialog.show(supportFragmentManager, "AddCardDialog")
     }
 
-    // Método para editar una card usando la API
     private fun showEditCardDialog(position: Int) {
         val card = items[position]
         val dialog = CardDialogFragment(
             initialTitle = card.title,
             initialDescription = card.description,
             initialWeight = card.weight.toString(),
-            initialPhotoUri = card.image
+            initialPhotoUri = card.image,
+            initialLatitude = card.latitude,
+            initialLongitude = card.longitude
         ) { title, description, weight, base64Image, lat, lon ->
             val updatedCard = card.copy(
                 title = title,

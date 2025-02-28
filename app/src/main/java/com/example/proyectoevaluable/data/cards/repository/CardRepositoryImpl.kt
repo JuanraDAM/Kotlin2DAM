@@ -7,7 +7,6 @@ import com.example.proyectoevaluable.domain.cards.models.Card
 import com.example.proyectoevaluable.domain.cards.models.Item
 import com.example.proyectoevaluable.domain.cards.repository.CardRepository
 import com.example.proyectoevaluable.domain.cards.requests.ItemsResponse
-// Importamos UpdateItemRequest (renombrado como CardUpdateItemRequest) desde el paquete correcto
 import com.example.domain.Cards.UpdateItemRequest as CardUpdateItemRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,22 +23,20 @@ class CardRepositoryImpl @Inject constructor(
 
     override suspend fun createCard(card: Card): Result<Card> = withContext(Dispatchers.IO) {
         try {
-            // Incluimos las coordenadas en el request
             val request = CreateItemRequest(
                 title = card.title,
                 description = card.description,
                 weight = card.weight,
                 image = card.image ?: "",  // Se enviará la cadena Base64 (vacía si no hay imagen)
                 userId = card.userId,
-                latitude = card.latitude,     // Nuevo
-                longitude = card.longitude    // Nuevo
+                latitude = card.latitude,    // <-- AGREGADO
+                longitude = card.longitude   // <-- AGREGADO
             )
             Log.d(TAG, "createCard: Enviando CreateItemRequest: $request")
             val response: Response<Item> = apiService.createItem(request)
             Log.d(TAG, "createCard: Código de respuesta: ${response.code()}")
             if (response.isSuccessful) {
                 response.body()?.let { createdItem ->
-                    // Mapeamos el objeto devuelto a Card, conservando las coordenadas pasadas en el request
                     val createdCard = Card(
                         id = createdItem.id,
                         title = createdItem.title,
@@ -47,8 +44,8 @@ class CardRepositoryImpl @Inject constructor(
                         weight = createdItem.weight,
                         image = createdItem.image,
                         userId = createdItem.userId,
-                        latitude = card.latitude,   // Se conserva la latitud enviada
-                        longitude = card.longitude  // Se conserva la longitud enviada
+                        latitude = card.latitude,
+                        longitude = card.longitude
                     )
                     Result.success(createdCard)
                 } ?: Result.failure(Exception("Respuesta vacía"))
@@ -68,23 +65,21 @@ class CardRepositoryImpl @Inject constructor(
 
     override suspend fun updateCard(card: Card): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            // Incluimos también las coordenadas en el request de actualización
             val request = CardUpdateItemRequest(
                 title = card.title,
                 description = card.description,
                 weight = card.weight,
                 image = card.image ?: "",
-                latitude = card.latitude,      // Nuevo
-                longitude = card.longitude     // Nuevo
+                latitude = card.latitude,    // <-- AGREGADO
+                longitude = card.longitude   // <-- AGREGADO
             )
-            Log.d(TAG, "Enviando UpdateItemRequest para card id=${card.id} con imagen de longitud: ${request.image?.length ?: 0}")
+            Log.d(TAG, "Enviando UpdateItemRequest para card id=${card.id} con imagen de longitud: ${request.image!!.length}")
             card.id?.let { id ->
                 val response = apiService.updateItem(id, request)
                 Log.d(TAG, "Código de respuesta de updateItem: ${response.code()}")
                 if (response.isSuccessful) {
                     Result.success(Unit)
                 } else {
-                    // Si hay error, intenta capturar el errorBody (sin loguearlo completo)
                     val errorBody = response.errorBody()?.string()?.take(300)
                     Log.e(TAG, "Error al actualizar ítem: ${response.code()}, errorBody (recortado): $errorBody")
                     Result.failure(Exception("Error al actualizar ítem: ${response.code()}"))

@@ -1,6 +1,7 @@
 package com.example.proyectoevaluable.ui.views.adapters
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
@@ -20,8 +21,7 @@ class MyAdapter(
     private val context: Context,
     private val items: MutableList<Card>,
     private val onDeleteConfirmed: (Int) -> Unit,
-    private val onEditClicked: (Int) -> Unit,
-    private val onMapsClicked: (Int) -> Unit
+    private val onEditClicked: (Int) -> Unit
 ) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -32,12 +32,12 @@ class MyAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val card = items[position]
+
         holder.titleTextView.text = card.title
         holder.descriptionTextView.text = card.description
+        holder.weightTextView.text = "Peso: ${card.weight} kg"
 
-        val weightInKg = "${card.weight} kg"
-        holder.weightTextView.text = "Peso: $weightInKg"
-
+        // Si hay imagen en Base64, se decodifica; de lo contrario, se muestra un placeholder.
         if (!card.image.isNullOrEmpty()) {
             val bitmap = decodeBase64ToBitmap(card.image)
             if (bitmap != null) {
@@ -49,6 +49,7 @@ class MyAdapter(
             holder.imageView.setImageResource(R.drawable.logo)
         }
 
+        // Al pulsar sobre la imagen, se muestra en un diálogo.
         holder.imageView.setOnClickListener {
             showImageDialog(card.image)
         }
@@ -66,11 +67,25 @@ class MyAdapter(
                 .show()
         }
 
+        // Maps button: abre Google Maps utilizando las coordenadas de la card.
         holder.mapsButton.setOnClickListener {
-            onMapsClicked(position)
+            if (card.latitude != null && card.longitude != null) {
+                val geoUri = android.net.Uri.parse("https://www.google.com/maps/search/?api=1&query=${card.latitude},${card.longitude}")
+                val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
+                if (mapIntent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(mapIntent)
+                } else {
+                    Toast.makeText(context, "No se encontró una aplicación de mapas", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(context, "No hay coordenadas para esta tarjeta", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
+    /**
+     * Decodifica una cadena Base64 en un Bitmap usando el flag NO_WRAP para evitar saltos de línea.
+     */
     fun decodeBase64ToBitmap(base64Str: String): Bitmap? {
         return try {
             val decodedBytes = Base64.decode(base64Str, Base64.NO_WRAP)
@@ -81,6 +96,9 @@ class MyAdapter(
         }
     }
 
+    /**
+     * Muestra un diálogo con la imagen decodificada.
+     */
     private fun showImageDialog(image: String?) {
         if (image.isNullOrEmpty()) {
             Toast.makeText(context, "No hay imagen para mostrar", Toast.LENGTH_SHORT).show()
