@@ -10,6 +10,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -30,8 +31,10 @@ object NetworkModule {
         val contentType = "application/json".toMediaType()
         val json = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()
-            .baseUrl("http://192.168.18.7:8080/") // Asegúrate de que sea esta URL
+            .baseUrl("http://192.168.18.7:8080/") // URL base correcta
             .client(okHttpClient)
+            // Agregamos primero el ScalarsConverterFactory para endpoints que devuelvan texto
+            .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
     }

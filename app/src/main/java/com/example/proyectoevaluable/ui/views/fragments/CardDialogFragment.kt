@@ -3,14 +3,16 @@ package com.example.proyectoevaluable.ui.views.fragments
 import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
+import android.os.Bundle
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
@@ -20,8 +22,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
@@ -34,9 +36,6 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 
-/**
- * Ahora, en lugar de recibir la imagen como Uri, el callback recibe el String en base64.
- */
 class CardDialogFragment(
     private val initialTitle: String? = null,
     private val initialDescription: String? = null,
@@ -54,19 +53,21 @@ class CardDialogFragment(
 
     private lateinit var rootView: View
 
-    // Registro de launchers mediante inicialización perezosa
-    private val cameraPermissionLauncher by lazy {
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+    // Inicializamos los launchers en onAttach (antes de que el fragmento se cree completamente)
+    private lateinit var cameraPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var cameraActivityLauncher: ActivityResultLauncher<Intent>
+    private lateinit var galleryActivityLauncher: ActivityResultLauncher<Intent>
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
                 openCamera()
             } else {
                 Toast.makeText(requireContext(), "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    private val cameraActivityLauncher by lazy {
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        cameraActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 photoUri?.let {
                     MediaScannerConnection.scanFile(requireContext(), arrayOf(currentPhotoPath), null, null)
@@ -82,10 +83,7 @@ class CardDialogFragment(
                 }
             }
         }
-    }
-
-    private val galleryActivityLauncher by lazy {
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        galleryActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
                 val selectedUri = result.data?.data
                 if (selectedUri == null) {
@@ -158,10 +156,11 @@ class CardDialogFragment(
                 if (title.isEmpty()) {
                     Toast.makeText(requireContext(), "El título es obligatorio", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Se asegura que siempre se envíe un String para image:
+                    // Aseguramos que siempre se envíe un String para image (Base64 o vacío)
                     val base64Image: String = photoUri?.let { uri ->
                         try {
                             val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
+                            // Cambio clave: usar NO_WRAP para evitar saltos de línea en el Base64
                             bitmapToBase64(bitmap)
                         } catch (e: Exception) {
                             ""
@@ -198,7 +197,8 @@ class CardDialogFragment(
 
     private fun checkCameraPermissions() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             openCamera()
         } else {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
@@ -318,14 +318,16 @@ class CardDialogFragment(
     }
 
     /**
-     * Convierte un Bitmap a una cadena Base64.
+     * Convierte un Bitmap a una cadena Base64 sin saltos de línea.
      */
     private fun bitmapToBase64(bitmap: Bitmap): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
-        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+        // Usamos NO_WRAP para obtener una cadena continua sin saltos de línea
+        return Base64.encodeToString(byteArray, Base64.NO_WRAP)
     }
+
 
     private fun openMapFromImage() {
         if (this::currentPhotoPath.isInitialized && currentPhotoPath.isNotEmpty()) {

@@ -19,24 +19,22 @@ class CardRepositoryImpl @Inject constructor(
     private val apiService: ApiService
 ) : CardRepository {
 
+    private val TAG = "CardRepository"
+
     override suspend fun createCard(card: Card): Result<Card> = withContext(Dispatchers.IO) {
         try {
-            // Mapear Card a CreateItemRequest
             val request = CreateItemRequest(
                 title = card.title,
                 description = card.description,
                 weight = card.weight,
-                image = card.image ?: "",
+                image = card.image ?: "",  // Se enviará la cadena Base64 (vacía si no hay imagen)
                 userId = card.userId
             )
-            Log.d("CardRepository", "Enviando CreateItemRequest: $request")
+            Log.d(TAG, "createCard: Enviando CreateItemRequest: $request")
             val response: Response<Item> = apiService.createItem(request)
-            Log.d("CardRepository", "Código de respuesta: ${response.code()}")
-            Log.d("CardRepository", "Respuesta de createItem: ${response.body()}")
+            Log.d(TAG, "createCard: Código de respuesta: ${response.code()}")
             if (response.isSuccessful) {
-                val createdItem = response.body()
-                if (createdItem != null) {
-                    // Convertir Item a Card
+                response.body()?.let { createdItem ->
                     val createdCard = Card(
                         id = createdItem.id,
                         title = createdItem.title,
@@ -44,29 +42,24 @@ class CardRepositoryImpl @Inject constructor(
                         weight = createdItem.weight,
                         image = createdItem.image,
                         userId = createdItem.userId,
-                        latitude = card.latitude,   // Puedes ajustar según corresponda
-                        longitude = card.longitude  // Puedes ajustar según corresponda
+                        latitude = card.latitude,
+                        longitude = card.longitude
                     )
                     Result.success(createdCard)
-                } else {
-                    Result.failure(Exception("Respuesta vacía"))
-                }
+                } ?: Result.failure(Exception("Respuesta vacía"))
             } else {
                 Result.failure(Exception("Error al crear ítem: ${response.code()}"))
             }
         } catch (e: Exception) {
-            Log.e("CardRepository", "Error en createCard", e)
+            Log.e(TAG, "createCard: Error", e)
             Result.failure(e)
         }
     }
 
+
     override suspend fun loadCards(): List<Card> = withContext(Dispatchers.IO) {
         val response: Response<ItemsResponse> = apiService.getItems()
-        if (response.isSuccessful) {
-            response.body()?.items ?: emptyList()
-        } else {
-            emptyList()
-        }
+        if (response.isSuccessful) response.body()?.items ?: emptyList() else emptyList()
     }
 
     override suspend fun updateCard(card: Card): Result<Unit> = withContext(Dispatchers.IO) {
@@ -77,30 +70,40 @@ class CardRepositoryImpl @Inject constructor(
                 weight = card.weight,
                 image = card.image ?: ""
             )
+            Log.d(TAG, "Enviando UpdateItemRequest para card id=${card.id} con imagen de longitud: ${request.image!!.length}")
             card.id?.let { id ->
                 val response = apiService.updateItem(id, request)
+                Log.d(TAG, "Código de respuesta de updateItem: ${response.code()}")
                 if (response.isSuccessful) {
                     Result.success(Unit)
                 } else {
+                    // Si hay error, intenta capturar el errorBody (sin loguearlo completo)
+                    val errorBody = response.errorBody()?.string()?.take(300)
+                    Log.e(TAG, "Error al actualizar ítem: ${response.code()}, errorBody (recortado): $errorBody")
                     Result.failure(Exception("Error al actualizar ítem: ${response.code()}"))
                 }
             } ?: Result.failure(Exception("ID nulo"))
         } catch (e: Exception) {
+            Log.e(TAG, "Error en updateCard", e)
             Result.failure(e)
         }
     }
+
 
     override suspend fun deleteCard(card: Card): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             card.id?.let { id ->
                 val response = apiService.deleteItem(id)
+                Log.d(TAG, "deleteCard: Código de delete: ${response.code()}")
                 if (response.isSuccessful) {
                     Result.success(Unit)
                 } else {
+                    Log.e(TAG, "deleteCard: Error al eliminar ítem: ${response.code()}")
                     Result.failure(Exception("Error al eliminar ítem: ${response.code()}"))
                 }
             } ?: Result.failure(Exception("ID nulo"))
         } catch (e: Exception) {
+            Log.e(TAG, "deleteCard: Error", e)
             Result.failure(e)
         }
     }
