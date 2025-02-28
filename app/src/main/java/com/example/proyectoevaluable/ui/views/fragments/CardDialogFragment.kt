@@ -40,6 +40,7 @@ class CardDialogFragment(
     private val initialTitle: String? = null,
     private val initialDescription: String? = null,
     private val initialWeight: String? = null,
+    // Para el caso de edición, si ya existe una imagen, se espera que sea un string Base64
     private val initialPhotoUri: String? = null,
     private val onSubmit: (String, String, String, String, Double?, Double?) -> Unit
 ) : DialogFragment() {
@@ -135,9 +136,16 @@ class CardDialogFragment(
         descriptionEditText.setText(initialDescription)
         weightEditText.setText(initialWeight)
 
+        // Si existe una imagen inicial, la decodificamos desde Base64 y la mostramos
         if (!initialPhotoUri.isNullOrEmpty()) {
-            photoUri = Uri.parse(initialPhotoUri)
-            selectPhotoImageView.setImageURI(photoUri)
+            val bitmap = decodeBase64ToBitmap(initialPhotoUri)
+            if (bitmap != null) {
+                selectPhotoImageView.setImageBitmap(bitmap)
+                // Opcional: guardar el bitmap en almacenamiento interno para futuras referencias
+                photoUri = saveBitmapToInternalStorage(bitmap)
+            } else {
+                selectPhotoImageView.setImageResource(R.drawable.logo)
+            }
         }
 
         selectPhotoImageView.setOnClickListener { showImagePickerOptions() }
@@ -156,11 +164,10 @@ class CardDialogFragment(
                 if (title.isEmpty()) {
                     Toast.makeText(requireContext(), "El título es obligatorio", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Aseguramos que siempre se envíe un String para image (Base64 o vacío)
+                    // Se asegura que siempre se envíe un String para image (Base64 o vacío)
                     val base64Image: String = photoUri?.let { uri ->
                         try {
                             val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
-                            // Cambio clave: usar NO_WRAP para evitar saltos de línea en el Base64
                             bitmapToBase64(bitmap)
                         } catch (e: Exception) {
                             ""
@@ -324,8 +331,17 @@ class CardDialogFragment(
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
-        // Usamos NO_WRAP para obtener una cadena continua sin saltos de línea
         return Base64.encodeToString(byteArray, Base64.NO_WRAP)
+    }
+
+    private fun decodeBase64ToBitmap(base64Str: String): Bitmap? {
+        return try {
+            val decodedBytes = Base64.decode(base64Str, Base64.NO_WRAP)
+            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
 

@@ -1,7 +1,9 @@
 package com.example.proyectoevaluable.ui.views.adapters
 
 import android.content.Context
-import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,19 +33,25 @@ class MyAdapter(
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val card = items[position]
 
-        // Usamos 'title' y 'description' en lugar de 'username' y 'password'
         holder.titleTextView.text = card.title
         holder.descriptionTextView.text = card.description
 
         val weightInKg = "${card.weight} kg"
         holder.weightTextView.text = "Peso: $weightInKg"
 
+        // Si hay imagen en Base64, se decodifica; de lo contrario, se muestra un placeholder
         if (!card.image.isNullOrEmpty()) {
-            holder.imageView.setImageURI(Uri.parse(card.image))
+            val bitmap = decodeBase64ToBitmap(card.image)
+            if (bitmap != null) {
+                holder.imageView.setImageBitmap(bitmap)
+            } else {
+                holder.imageView.setImageResource(R.drawable.logo)
+            }
         } else {
             holder.imageView.setImageResource(R.drawable.logo)
         }
 
+        // Al pulsar sobre la imagen, se muestra en un diálogo
         holder.imageView.setOnClickListener {
             showImageDialog(card.image)
         }
@@ -66,16 +74,36 @@ class MyAdapter(
         }
     }
 
+    /**
+     * Decodifica una cadena Base64 en un Bitmap usando el flag NO_WRAP para evitar saltos de línea.
+     */
+    fun decodeBase64ToBitmap(base64Str: String): Bitmap? {
+        return try {
+            val decodedBytes = Base64.decode(base64Str, Base64.NO_WRAP)
+            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    /**
+     * Muestra un diálogo con la imagen decodificada.
+     */
     private fun showImageDialog(image: String?) {
         if (image.isNullOrEmpty()) {
             Toast.makeText(context, "No hay imagen para mostrar", Toast.LENGTH_SHORT).show()
             return
         }
+        val bitmap = decodeBase64ToBitmap(image)
+        if (bitmap == null) {
+            Toast.makeText(context, "Error al mostrar la imagen", Toast.LENGTH_SHORT).show()
+            return
+        }
         val dialog = AlertDialog.Builder(context).create()
-        val dialogView = LayoutInflater.from(context)
-            .inflate(R.layout.dialog_image, null)
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_image, null)
         val imageView = dialogView.findViewById<ImageView>(R.id.dialog_image_view)
-        imageView.setImageURI(Uri.parse(image))
+        imageView.setImageBitmap(bitmap)
         dialog.setView(dialogView)
         dialog.setCanceledOnTouchOutside(true)
         dialog.window?.setLayout(
