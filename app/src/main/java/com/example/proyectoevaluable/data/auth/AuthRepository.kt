@@ -40,12 +40,15 @@ class AuthRepository @Inject constructor(
     suspend fun register(email: String, password: String): Result<String> = withContext(Dispatchers.IO) {
         try {
             val response = remoteDataSource.register(email, password)
+            Log.d("AuthRepository", "Register response code: ${response.code()}")
+            Log.d("AuthRepository", "Register response body: ${response.body()}")
             if (response.isSuccessful) {
                 Result.success(response.body() ?: "Registro exitoso")
             } else {
                 Result.failure(Exception("Error en registro: ${response.code()}"))
             }
         } catch (e: Exception) {
+            Log.e("AuthRepository", "Error en registro", e)
             Result.failure(e)
         }
     }
@@ -66,7 +69,6 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    // Método para recuperación de contraseña
     suspend fun recoverPassword(email: String, newPassword: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val response = remoteDataSource.recoverPassword(email, newPassword)

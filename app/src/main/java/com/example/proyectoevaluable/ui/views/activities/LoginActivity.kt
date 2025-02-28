@@ -73,7 +73,6 @@ class LoginActivity : AppCompatActivity() {
             if (email.isEmpty()) {
                 Toast.makeText(this, "Introduce un correo electrónico", Toast.LENGTH_SHORT).show()
             } else {
-                // Muestra el diálogo de recuperación sin requerir token
                 val dialog = RecoverPasswordDialogFragment.newInstance(email)
                 dialog.show(supportFragmentManager, "RecoverPasswordDialogFragment")
             }

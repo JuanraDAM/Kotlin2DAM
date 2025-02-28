@@ -17,6 +17,8 @@ class AuthRemoteDataSource @Inject constructor(
 
     suspend fun register(email: String, password: String): Response<String> {
         val request = RegisterRequest(email, password)
+        // Agregamos log para depurar
+        println("AuthRemoteDataSource: Enviando RegisterRequest: $request")
         return apiService.registerUser(request)
     }
 

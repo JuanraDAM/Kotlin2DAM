@@ -9,9 +9,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyectoevaluable.R
 import com.example.proyectoevaluable.domain.cards.models.Card
+import com.example.proyectoevaluable.domain.cards.models.Card_Static
 
 class StaticTipsAdapter(
-    private val items: List<Card>
+    private val items: List<Card_Static>
 ) : RecyclerView.Adapter<StaticTipsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,9 +28,6 @@ class StaticTipsAdapter(
         holder.titleTextView.text = card.title
         holder.descriptionTextView.text = card.description
 
-        // Asumimos que weight es Int, por lo que lo convertimos a String
-        val weightText = "${card.weight} kg"
-        holder.weightTextView.text = "Peso: $weightText"
 
         if (!card.image.isNullOrEmpty()) {
             holder.imageView.setImageURI(Uri.parse(card.image))
@@ -44,6 +42,5 @@ class StaticTipsAdapter(
         val imageView: ImageView = itemView.findViewById(R.id.item_image)
         val titleTextView: TextView = itemView.findViewById(R.id.item_title)
         val descriptionTextView: TextView = itemView.findViewById(R.id.item_description)
-        val weightTextView: TextView = itemView.findViewById(R.id.item_weight)
     }
 }

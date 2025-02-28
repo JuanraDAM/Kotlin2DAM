@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyectoevaluable.R
 import com.example.proyectoevaluable.domain.cards.models.Card
+import com.example.proyectoevaluable.domain.cards.models.Card_Static
 import com.example.proyectoevaluable.ui.views.adapters.StaticTipsAdapter
 
 class FishingTipsFragment : Fragment() {
@@ -27,43 +28,38 @@ class FishingTipsFragment : Fragment() {
 
     private fun setUpRecyclerView() {
         val tips = listOf(
-            Card(
+            Card_Static(
                 id = null,
                 title = "Consejo 1",
                 description = "Utiliza cebo fresco para atraer más peces.",
-                weight = 0,
                 image = null,
                 userId = 0
             ),
-            Card(
+            Card_Static(
                 id = null,
                 title = "Consejo 2",
                 description = "Los mejores momentos para pescar son al amanecer y al atardecer.",
-                weight = 0,
                 image = null,
                 userId = 0
             ),
-            Card(
+            Card_Static(
                 id = null,
                 title = "Consejo 3",
                 description = "Usa una caña de pescar adecuada para el tipo de pez que deseas capturar.",
-                weight = 0,
                 image = null,
                 userId = 0
             ),
-            Card(
+            Card_Static(
                 id = null,
                 title = "Consejo 4",
                 description = "Lleva siempre un equipo de seguridad adecuado.",
-                weight = 0,
                 image = null,
                 userId = 0
             ),
-            Card(
+            Card_Static(
                 id = null,
                 title = "Consejo 5",
                 description = "Investiga sobre las condiciones del agua y el clima antes de salir.",
-                weight = 0,
                 image = null,
                 userId = 0
             )
