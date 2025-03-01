@@ -18,7 +18,6 @@ class UserRepository @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                // Puedes agregar un log para imprimir response.errorBody()?.string()
                 Result.failure(Exception("Error al actualizar: ${response.code()} - ${response.errorBody()?.string()}"))
             }
         } catch (e: Exception) {

@@ -10,7 +10,6 @@ class SharedPrefsDataSource @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val gson: Gson
 ) {
-    // Se obtiene el UID del usuario desde SharedPreferences
     private val currentUserUid: String?
         get() = sharedPreferences.getString("current_user_uid", null)
 

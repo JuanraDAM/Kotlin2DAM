@@ -27,10 +27,10 @@ class CardRepositoryImpl @Inject constructor(
                 title = card.title,
                 description = card.description,
                 weight = card.weight,
-                image = card.image ?: "",  // Se enviará la cadena Base64 (vacía si no hay imagen)
+                image = card.image ?: "",
                 userId = card.userId,
-                latitude = card.latitude,    // <-- AGREGADO
-                longitude = card.longitude   // <-- AGREGADO
+                latitude = card.latitude,
+                longitude = card.longitude
             )
             Log.d(TAG, "createCard: Enviando CreateItemRequest: $request")
             val response: Response<Item> = apiService.createItem(request)
@@ -70,8 +70,8 @@ class CardRepositoryImpl @Inject constructor(
                 description = card.description,
                 weight = card.weight,
                 image = card.image ?: "",
-                latitude = card.latitude,    // <-- AGREGADO
-                longitude = card.longitude   // <-- AGREGADO
+                latitude = card.latitude,
+                longitude = card.longitude
             )
             Log.d(TAG, "Enviando UpdateItemRequest para card id=${card.id} con imagen de longitud: ${request.image!!.length}")
             card.id?.let { id ->

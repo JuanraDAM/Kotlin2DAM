@@ -24,7 +24,6 @@ class StaticTipsAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val card = items[position]
 
-        // Se utilizan los campos actualizados del modelo Card
         holder.titleTextView.text = card.title
         holder.descriptionTextView.text = card.description
 

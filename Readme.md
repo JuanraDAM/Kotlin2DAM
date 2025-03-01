@@ -72,37 +72,6 @@
 
 ---
 
-## Instalación
-
-1. **Clonar el Repositorio:**  
-   Abre una terminal y ejecuta:
-   ```bash
-   git clone https://github.com/JuanraDAM/Kotlin2DAM.git
-   ```
-   (Asegúrate de seleccionar la rama correspondiente, por ejemplo, `Version3.1Y3.2`).
-
-2. **Abrir en Android Studio:**  
-   Importa el proyecto clonado en Android Studio.
-
-3. **Configurar Firebase:**
-  - Crea un proyecto en Firebase.
-  - Descarga el archivo `google-services.json` y colócalo en la carpeta `app`.
-  - Sincroniza el proyecto con Gradle para integrar las dependencias de Firebase.
-
-4. **Verificar la Configuración del FileProvider:**
-  - Asegúrate de que el archivo `file_paths.xml` se encuentre en `app/src/main/res/xml/` con la siguiente configuración:
-    ```xml
-    <?xml version="1.0" encoding="utf-8"?>
-    <paths xmlns:android="http://schemas.android.com/apk/res/android">
-        <external-files-path name="external_files" path="." />
-    </paths>
-    ```
-
-5. **Ejecutar la Aplicación:**  
-   Compila y ejecuta la aplicación en un dispositivo físico o un emulador Android.
-
----
-
 ## Uso
 
 1. **Inicio de Sesión / Registro:**
@@ -133,61 +102,70 @@ El proyecto se organiza siguiendo los principios de Clean Architecture y MVVM:
 
 ```plaintext
 PescaPro/
-├── MyApplication.kt
+.
 ├── data
-│   ├── auth
-│   │   ├── AuthRepository.kt
-│   │   └── UserRepository.kt
-│   ├── cards
-│   │   ├── datasource
-│   │   │   └── SharedPrefsDataSource.kt
-│   │   └── repository
-│   │       └── CardRepositoryImpl.kt
-│   └── remote
-│       ├── ApiService.kt
-│       ├── AuthRemoteDataSource.kt
-│       └── UserRemoteDataSource.kt
+│   ├── auth
+│   │   ├── AuthRepository.kt
+│   │   └── UserRepository.kt
+│   ├── cards
+│   │   ├── datasource
+│   │   │   └── SharedPrefsDataSource.kt
+│   │   └── repository
+│   │       └── CardRepositoryImpl.kt
+│   └── remote
+│       ├── ApiService.kt
+│       ├── AuthRemoteDataSource.kt
+│       └── UserRemoteDataSource.kt
 ├── di
-│   ├── AppModule.kt
-│   ├── AuthInterceptor.kt
-│   ├── CardRepositoryModule.kt
-│   ├── NetworkModule.kt
-│   └── TokenManager.kt
+│   ├── AppModule.kt
+│   ├── AuthInterceptor.kt
+│   ├── CardRepositoryModule.kt
+│   ├── NetworkModule.kt
+│   └── TokenManager.kt
 ├── domain
-│   ├── auth
-│   │   ├── AuthResponse.kt
-│   │   ├── LoginRequest.kt
-│   │   ├── RecoverPasswordRequest.kt
-│   │   ├── RegisterRequest.kt
-│   │   └── UpdateUserRequest.kt
-│   └── cards
-│       ├── models
-│       │   └── Card.kt         // Incluye latitude y longitude
-│       ├── repository
-│       │   └── CardRepository.kt
-│       ├── requests
-│       │   ├── CreateItemRequest.kt  // Incluye latitude y longitude
-│       │   ├── ItemsResponse.kt
-│       │   └── UpdateItemRequest.kt  // Incluye latitude y longitude
-│       └── usecase
-│           ├── UseCaseLoadCards.kt
-│           ├── UseCaseSaveCards.kt
-│           └── UseCaseDeleteCard.kt
+│   ├── auth
+│   │   ├── AuthResponse.kt
+│   │   ├── LoginRequest.kt
+│   │   ├── RecoverPasswordRequest.kt
+│   │   ├── RegisterRequest.kt
+│   │   ├── UpdateUserRequest.kt
+│   │   └── UpdateUserUseCase.kt
+│   └── cards
+│       ├── models
+│       │   ├── Card.kt
+│       │   ├── Card_Static.kt
+│       │   └── Item.kt
+│       ├── repository
+│       │   └── CardRepository.kt
+│       ├── requests
+│       │   ├── CreateItemRequest.kt
+│       │   ├── CreateItemResponse.kt
+│       │   ├── ItemsResponse.kt
+│       │   └── UpdateItemRequest.kt
+│       └── usecase
+│           ├── UseCaseDeleteCard.kt
+│           ├── UseCaseLoadCards.kt
+│           ├── UseCaseSaveCards.kt
+│           └── UseCaseUpdateCard.kt
+├── MyApplication.kt
 └── ui
     ├── viewmodel
-    │   └── cards
-    │       └── ListViewModel.kt
+    │   └── cards
+    │       └── ListViewModel.kt
     └── views
         ├── activities
-        │   ├── LoginActivity.kt
-        │   └── ListActivity.kt
+        │   ├── ListActivity.kt
+        │   ├── LoginActivity.kt
+        │   └── SplashActivity.kt
         ├── adapters
-        │   ├── MyAdapter.kt
-        │   └── StaticTipsAdapter.kt
+        │   ├── MyAdapter.kt
+        │   └── StaticTipsAdapter.kt
         └── fragments
-            ├── CardDialogFragment.kt  // Maneja imágenes Base64 y coordenadas
+            ├── CardDialogFragment.kt
             ├── FishingTipsFragment.kt
+            ├── RecoverPasswordDialogFragment.kt
             └── UserFragment.kt
+
 ```
 
 ### Descripción de Directorios
@@ -234,6 +212,8 @@ Para trabajar correctamente con imágenes capturadas (usadas en CardDialogFragme
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-path name="images" path="Android/data/com.example.proyectoevaluable/files/Pictures/" />
+    <external-path name="public_pictures" path="Pictures/" />
     <external-files-path name="external_files" path="." />
 </paths>
 ```
@@ -250,20 +230,15 @@ Se han incluido todos los permisos necesarios, como acceso a la cámara, almacen
    ```bash
    git clone https://github.com/JuanraDAM/Kotlin2DAM.git
    ```
-   (Selecciona la rama correspondiente, por ejemplo, `Version3.1Y3.2`).
+   (Selecciona la rama correspondiente, por ejemplo, `Version4.1`).
 
 2. **Abrir en Android Studio:**  
    Importa el proyecto clonado.
 
-3. **Configurar Firebase:**
-  - Crea un proyecto en Firebase y añade tu aplicación.
-  - Descarga y coloca el archivo `google-services.json` en la carpeta `app`.
-  - Sincroniza el proyecto con Gradle.
-
-4. **Verificar la Configuración del FileProvider:**  
+3. **Verificar la Configuración del FileProvider:**  
    Asegúrate de que el archivo `file_paths.xml` esté en la carpeta correcta.
 
-5. **Ejecutar la Aplicación:**  
+4. **Ejecutar la Aplicación:**  
    Compila y ejecuta la aplicación en un dispositivo físico o un emulador.
 
 ---

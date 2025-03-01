@@ -31,9 +31,8 @@ object NetworkModule {
         val contentType = "application/json".toMediaType()
         val json = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()
-            .baseUrl("http://192.168.18.7:8080/") // URL base correcta
+            .baseUrl("http://192.168.18.7:8080/") // Url de mi servidor en pruebas
             .client(okHttpClient)
-            // Agregamos primero el ScalarsConverterFactory para endpoints que devuelvan texto
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()

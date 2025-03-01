@@ -134,7 +134,6 @@ class ListActivity : AppCompatActivity() {
             onEditClicked = { position ->
                 showEditCardDialog(position)
             }
-            // Se elimina el parámetro "onMapsClicked" ya que la funcionalidad se implementa directamente en el adapter.
         )
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter

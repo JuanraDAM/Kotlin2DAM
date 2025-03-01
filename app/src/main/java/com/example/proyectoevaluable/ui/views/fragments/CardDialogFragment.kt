@@ -41,9 +41,7 @@ class CardDialogFragment(
     private val initialTitle: String? = null,
     private val initialDescription: String? = null,
     private val initialWeight: String? = null,
-    // Para el modo edición, la imagen viene en Base64
     private val initialPhotoUri: String? = null,
-    // NUEVOS parámetros: coordenadas que se hayan almacenado previamente en la card
     private val initialLatitude: Double? = null,
     private val initialLongitude: Double? = null,
     private val onSubmit: (String, String, String, String, Double?, Double?) -> Unit

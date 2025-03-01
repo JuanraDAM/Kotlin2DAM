@@ -15,11 +15,10 @@ import javax.inject.Inject
 @HiltViewModel
 class ListViewModel @Inject constructor(
     private val cardRepository: CardRepository,
-    private val deleteCardUseCase: com.example.proyectoevaluable.domain.cards.usecase.UseCaseDeleteCard,
+    private val deleteCardUseCase: UseCaseDeleteCard,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
-    // LiveData que contiene la lista de cards
     private val _cards = MutableLiveData<List<Card>>(emptyList())
     val cards: LiveData<List<Card>> get() = _cards
 
@@ -31,8 +30,6 @@ class ListViewModel @Inject constructor(
                 val createdCard = result.getOrNull()
                 val currentList = _cards.value.orEmpty()
                 _cards.postValue(currentList + listOf(createdCard!!))
-            } else {
-                // Aquí podrías notificar el error a la UI
             }
         }
     }
@@ -47,8 +44,6 @@ class ListViewModel @Inject constructor(
                 if (result) {
                     // Recarga las cards del usuario tras la eliminación
                     loadCards()
-                } else {
-                    // Gestión del error: podrías notificar a la UI, por ejemplo con un Toast
                 }
             }
         }
@@ -66,8 +61,6 @@ class ListViewModel @Inject constructor(
                     currentCards[index] = card
                     _cards.postValue(currentCards)
                 }
-            } else {
-                // Gestiona el error (mostrar mensaje, etc.)
             }
         }
     }
