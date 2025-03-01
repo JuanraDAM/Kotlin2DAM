@@ -45,9 +45,6 @@
 - **Hilt (Dependency Injection):**  
   Se utiliza Hilt para la inyección de dependencias, simplificando la gestión de componentes como ViewModels, Repositories y casos de uso.
 
-- **Firebase Authentication:**  
-  Gestiona el registro, inicio de sesión, recuperación y verificación de usuarios.
-
 - **Retrofit y Kotlin Serialization:**  
   Se utiliza Retrofit para la comunicación con la API y Kotlin Serialization para la conversión de objetos a JSON y viceversa.
 
